@@ -51,6 +51,13 @@ ingestion/prisma/dev.db-journal
 Thumbs.db
 
 # Project specific
+debug*.py
+test*.py
+verify*.py
+check*.py
+analyze*.py
+inspect*.py
+reproduction.py
 backend/.venv/
 frontend/dist/
 scrapper-etudiant/venv/
