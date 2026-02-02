@@ -1,0 +1,222 @@
+scraped_name,scraped_city,scraped_dept,matched_uai,matched_name,match_score
+Henri-IV,Paris,75.0,0750654D,Lycée Henri IV,90
+Sainte-Marie,Lyon,69.0,0690521S,Lycée Sainte - Marie Lyon,86
+Stanislas,Paris,75.0,0753840S,Lycée Stanislas,90
+Hoche,Versailles,78.0,0782562L,Lycée Hoche,90
+ND-du-Grandchamp,Versailles,78.0,0783351U,Lycée Notre Dame du Grandchamp,86
+St-Louis-de-Gonzague,Paris,75.0,0753933T,Lycée Saint-Louis De Gonzague,87
+Chartreux,Lyon,69.0,0690564N,Institution des Chartreux,90
+Le Parc,Lyon,69.0,0690026D,Lycée du Parc,86
+Champollion,Grenoble,38.0,0380027Y,Lycée Champollion,95
+Pierre-de-Fermat,Toulouse,31.0,0310036W,Lycée Pierre De Fermat,95
+Marcelin-Berthelot,St-Maur-des-Fossés,94.0,0940120V,Lycée Marcelin Berthelot,95
+Ampère,Lyon,69.0,0690023A,Lycée Ampère,90
+St-Vincent-Providence,Rennes,35.0,0350776D,Lycée St Vincent-Providence,95
+Stanislas,Cannes,6.0,0060673Z,Lycée Stanislas,90
+Janson-de-Sailly,Paris,75.0,0750699C,Lycée Janson De Sailly,95
+Carnot,Paris,75.0,0750704H,Lycée Carnot,90
+Kléber,Strasbourg,67.0,0670080Y,Lycée Kléber,90
+Saint-Jean,Douai,59.0,0592940A,Lycée Saint-Jean,90
+Alfred-Kastler,Cergy-Pontoise,95.0,0951399E,Lycée Alfred Kastler,95
+Berthollet,Annecy,74.0,0740003B,Lycée Berthollet,90
+Blaise-Pascal,Clermont-Ferrand,63.0,0630018C,Lycée Blaise Pascal,95
+Carnot,Dijon,21.0,0210015C,Lycée Carnot,90
+Charles-De-Gaulle,Caen,14.0,0142107P,Lycée Charles-De-Gaulle,95
+Chateaubriand,Rennes,35.0,0350710G,Lycée Francois René De Chateaubriand,90
+Clemenceau,Reims,51.0,0510031G,Lycée CLEMENCEAU,90
+Faidherbe,Lille,59.0,0590119J,Lycée Faidherbe,90
+Henri-Poincaré,Nancy,54.0,0540038Y,Lycée Henri Poincaré,95
+Intégrale,Paris,75.0,,SKIPPED (Parcoursup=non),0
+Ipesup,Paris,75.0,,SKIPPED (Parcoursup=non),0
+Kerichen,Brest,29.0,0290007A,Lycée La Pérouse - Kerichen,90
+Montaigne,Bordeaux,33.0,0330021U,Lycée Montaigne,90
+Montaigne,Paris,75.0,0750657G,Lycée Montaigne,90
+ND-des-Minimes,Lyon,69.0,0690564N,Institution des Chartreux,86
+Ozenne,Toulouse,31.0,0310047H,Lycée Ozenne,90
+Saint-Charles,Marseille,13.0,0130039X,Lycée Saint Charles,95
+Saint-Just,Lyon,69.0,0690028F,Lycée De Saint Just,90
+St-Michel-de-Picpus,Paris,75.0,0753897D,Lycée Saint Michel de Picpus,87
+Ste-Marie-Gd-Lebrun,Bordeaux,33.0,0331503E,Lycée Sainte Marie Grand Lebrun,86
+La Prépa Autrement,Paris,75.0,,SKIPPED (Parcoursup=non),0
+Alexandre-Dumas (ex-Florent-Schmitt),St-Cloud,92.0,0920801W,Lycée Alexandre Dumas,86
+Aliénor d'Aquitaine,Poitiers,86.0,0860038Z,Lycée Aliénor d' Aquitaine,95
+Claude-Fauriel,St-Etienne,42.0,0420041S,Lycée Claude Fauriel,95
+Gaston-Berger,Lille,59.0,0590258K,Lycée Gaston Berger,95
+La Nativité,Aix-en-Provence,13.0,0131319N,ALycée Nativite (La),86
+Marguerite-Jauzelon (ex-Bellepierre),St-Denis-de-la-Réunion,974.0,9740839U,Institut formation soins infirmiers Bellepierre Saint Denis,86
+ND-de-Sainte-Croix,Neuilly-sur-Seine,92.0,0920919Z,Lycée Notre Dame de Ste Croix,86
+Philippine-Duchesne Itec-Boisfleury,Grenoble,38.0,0383208F,Lycée PHILIPPINE DUCHESNE ITEC,0
+Saint-Paul,Lille,59.0,0593114P,Lycée Saint-Paul,90
+St-Joseph-du-Loquidy,Nantes,44.0,0440161L,Lycée St Joseph du Loquidy,95
+Vernet,Valence,26.0,0260035X,Lycée CAMILLE VERNET,90
+WeiD Prépa,Paris,75.0,,SKIPPED (Parcoursup=non),0
+Louis-le-Grand,Paris,75.0,0750655E,Lycée Louis Le Grand,95
+Ste-Geneviève,Versailles,78.0,0783053V,Lycée Sainte Geneviève,86
+Saint-Louis,Paris,75.0,0750658H,Lycée Saint-Louis,90
+St-Jean-de-Passy,Paris,75.0,0753947H,Lycée Saint Jean de Passy,87
+Michelet,Vanves,92.0,0920149M,Lycée Michelet,90
+Lavoisier,Paris,75.0,0750656F,Lycée Lavoisier,90
+Corneille,Rouen,76.0,0760090K,Lycée Pierre Corneille,90
+Baimbridge,Pointe-à-Pitre,971.0,9710003B,Lycée Baimbridge,86
+Chaptal,Paris,75.0,0750663N,Lycée Chaptal,90
+Clemenceau,Nantes,44.0,0440021J,Lycée général Clemenceau,90
+Descartes,Antony,92.0,0920130S,Lycée Descartes,90
+Descartes,Tours,37.0,0370035M,Lycée Descartes,90
+Fabert,Metz,57.0,0570054Z,Lycée Fabert,90
+First Preparatory Classes of High Schools Private,Meknès,,,SKIPPED (Parcoursup=non),0
+Hélène-Boucher,Paris,75.0,0750714U,Lycée Hélène Boucher,95
+Joffre,Montpellier,34.0,0340038G,Lycée Joffre,90
+La Bruyère,Versailles,78.0,0782563M,Lycée La Bruyère,90
+Lakanal,Sceaux,92.0,0920145H,Lycée Lakanal,90
+Louis-Pergaud,Besançon,25.0,0250010A,Lycée Louis Pergaud,95
+Masséna,Nice,6.0,0060030A,Lycée Masséna,90
+Moulay Ismail,Meknès,,,SKIPPED (Parcoursup=non),0
+Pothier,Orléans,45.0,0450049J,Lycée Pothier,90
+Thiers,Marseille,13.0,0130040Y,Lycée Thiers,90
+Al Cachy,Fès,,,SKIPPED (Parcoursup=non),0
+Al Khansaa,Casablanca,,,SKIPPED (Parcoursup=non),0
+Al Qalam,Agadir,,,SKIPPED (Parcoursup=non),0
+Aliénor-d'Aquitaine,Poitiers,86.0,0860038Z,Lycée Aliénor d' Aquitaine,95
+Amyot,Melun,77.0,0770933W,Lycée Jacques Amyot,90
+Audentia School (new 2025),Meknès,,,SKIPPED (Parcoursup=non),0
+Cézanne,Aix-en-Provence,13.0,0130002G,Lycée Paul Cezanne,82
+Emmanuel-d'Alzon,Nîmes,30.0,0300080Z,Lycée Emmanuel d'Alzon,95
+Errazi,El Jadida,,,SKIPPED (Parcoursup=non),0
+Esprit Prépas,Tanger,,,SKIPPED (Parcoursup=non),0
+First Prepas Marrakech,Marrakech,,,SKIPPED (Parcoursup=non),0
+Gay-Lussac,Limoges,87.0,0870015U,Lycée Gay-Lussac,90
+Ibn Ghazi,Marrakech,,,SKIPPED (Parcoursup=non),0
+Louis-Thuillier,Amiens,80.0,0800009A,Lycée Louis Thuillier,95
+Marguerite Jauzelon (ex-Bellepierre),St-Denis-de-la-Réunion,974.0,9740839U,Institut formation soins infirmiers Bellepierre Saint Denis,86
+Mohamed VI,Kenitra,,,SKIPPED (Parcoursup=non),0
+Moulay-Hassan,Tanger,,,SKIPPED (Parcoursup=non),0
+MyPrepa,Paris,75.0,,SKIPPED (Parcoursup=non),0
+Omar Al-Khayyam,Rabat,,,SKIPPED (Parcoursup=non),0
+Reda-Slaoui,Agadir,,,SKIPPED (Parcoursup=non),0
+Saliège,Toulouse,31.0,,,0
+Schweitzer,Le Raincy,93.0,0930830X,Lycée Albert Schweitzer,90
+Touchard,Le Mans,72.0,0720033V,Lycée Polyvalent Gabriel Touchard - Washington,90
+WeiD,Paris,75.0,,SKIPPED (Parcoursup=non),0
+Sainte-Marie,Neuilly-sur-Seine,92.0,0920875B,Lycée Sainte-Marie de Neuilly,90
+Fustel-de-Coulanges,Strasbourg,67.0,0670079X,Lycée Fustel De Coulanges,95
+Saint-Sernin,Toulouse,31.0,0310041B,Lycée Saint-Sernin,95
+Voltaire,Paris,75.0,0750675B,Lycée Voltaire,90
+Guist'hau,Nantes,44.0,0440024M,Lycée général Gabriel Guist'Hau,90
+Albert-Châtelet,Douai,59.0,0590063Y,Lycée Albert Chatelet,82
+Alphonse-Daudet,Nîmes,30.0,0300021K,Lycée Alphonse DAUDET,95
+Blanche-de-Castille,Nantes,44.0,0440154D,Lycée Blanche De Castille,95
+Brugière,Clermont-Ferrand,63.0,,,0
+Claude-Monet,Le Havre,76.0,0760174B,Lycée Claude Monet,95
+Emmanuel-Mounier,Grenoble,38.0,0380032D,Lycée polyvalent Emmanuel Mounier,90
+Henri-IV,Béziers,34.0,0340009A,Lycée HENRI IV,90
+Jacques-Amyot,Melun,77.0,0770933W,Lycée Jacques Amyot,95
+ND-de-la-Paix,Lille,59.0,0593109J,Lycée Notre Dame de la Paix,86
+Saint-Marc,Lyon,69.0,0690571W,Lycée Saint-Marc,90
+Saint-Sigisbert,Nancy,54.0,0541318P,Lycée Notre Dame Saint Sigisbert,90
+St-François-Xavier,Vannes,56.0,0560114V,Lycée Saint François-Xavier,86
+Fénelon-Ste-Marie,Paris,75.0,0753873C,Lycée Fénelon Sainte-Marie,86
+René-Cassin,Bayonne,64.0,0640010N,Lycée René Cassin Bayonne-Biarritz,90
+Blaise-Pascal,Orsay,91.0,0910626L,Lycée Blaise Pascal,95
+Lazaristes,Lyon,69.0,0690522T,Lycée Aux Lazaristes,90
+Aristide-Briand,Evreux,27.0,0270016W,Lycée Aristide Briand,95
+Aristide-Briand,St-Nazaire,44.0,0440069L,LGT Aristide Briand,95
+Assomption-Bellevue,Lyon,69.0,0690539L,Lycée Assomption Bellevue,95
+Balzac,Paris,75.0,0750705J,Lycée Honoré De Balzac,90
+Bellevue,Toulouse,31.0,0310038Y,Lycée BELLEVUE,90
+Bertran-de-Born,Périgueux,24.0,0240024W,Lycée Bertran De Born,95
+Brizeux,Quimper,29.0,0290069T,Lycée Auguste Brizeux,90
+Buffon,Paris,75.0,0750693W,Lycée Buffon,90
+Camille-Guérin,Poitiers,86.0,0860035W,Lycée Camille Guérin,95
+Camille-Jullian,Bordeaux,33.0,0330023W,Lycée Camille Jullian,95
+Charlemagne,Paris,75.0,0750652B,Lycée Charlemagne,95
+Chrestien-de-Troyes,Troyes,10.0,0100022V,Lycée Chrestien de Troyes,95
+CIV-Valbonne,Sophia-Antipolis,6.0,0061642C,Lycée International de Valbonne,86
+Condorcet,Paris,75.0,0750667T,Lycée Condorcet,90
+Corot,Savigny-sur-Orge,91.0,0910627M,Lycée Jean Baptiste Corot,90
+Daudet,Nîmes,30.0,0300021K,Lycée Alphonse DAUDET,90
+Déodat-de-Séverac,Toulouse,31.0,0310044E,Lycée Déodat de Séverac,95
+Descartes,Montigny-le-Bretonneux,78.0,0781512V,Lycée Descartes,90
+Dumont-d'Urville,Toulon,83.0,0830053G,Lycée Dumont d'Urville,95
+Dupuy-de-Lôme,Lorient,56.0,0560025Y,Lycée Dupuy De Lôme,95
+Edmont-Perrier,Tulle,19.0,,,0
+Fénelon,Paris,75.0,0753873C,Lycée Fénelon Sainte-Marie,90
+François-1er,Fontainebleau,77.0,,,0
+François-1er,Le Havre,76.0,0760052U,Lycée François 1er,95
+François-Arago,Perpignan,66.0,0660010C,Lycée François Arago,95
+Franklin-Roosevelt,Reims,51.0,0510034K,Lycée Franklin Roosevelt,95
+Gustave-Monod,Enghien-les-Bains,95.0,0952196W,LYCEE POLYVALENT GUSTAVE MONOD,90
+Henri-Bergson,Angers,49.0,0491966W,Lycée général et technologique Henri Bergson,90
+IPEST,Tunis,,1120002U,ESSCA School of Management - Budapest,80
+Jacques-Decour,Paris,75.0,0750668U,Lycée Jacques Decour,95
+Jean-Perrin,Lyon,69.0,0690082P,Lycée Jean Perrin,95
+Jeanne-d'Albret,St-Germain-en-Laye,78.0,0782132U,Lycée Jeanne D'Albret,95
+L'Empéri,Salon-de-Provence,13.0,0130160D,Lycée de L'Emperi,86
+La Martinière-Monplaisir,Lyon,69.0,0692866R,Lycée La Martiniere Monplaisir,88
+Lapérouse,Albi,81.0,,,0
+Leconte-de-Lisle,St-Denis-de-La-Réunion,974.0,9740001H,Lycée Leconte de Lisle,95
+Louis-Barthou,Pau,64.0,0640055M,Lycée Louis Barthou,95
+Marceau,Chartres,28.0,0280007F,Lycée Marceau,90
+Montesquieu,Le Mans,72.0,0720029R,Lycée Montesquieu,95
+Pasteur,Neuilly-sur-Seine,92.0,0920142E,Lycée Louis Pasteur,90
+Pierre-d'Ailly,Compiègne,60.0,0600014P,Lycée Pierre d'Ailly,95
+Pierre-de-la-Ramée,St-Quentin,2.0,0020049T,Lycée Pierre de la Ramée,86
+Pierre-Gilles-de-Gennes (ex-ENCPB),Paris,75.0,0750685M,Lycée Pierre-Gilles de Gennes - ENCPB,90
+Prytanée National Militaire,La Flèche,72.0,0720896H,Lycée Militaire Prytanee National,85
+Saint-Joseph,Avignon,84.0,0840072X,Lycée St Joseph,86
+Saint-Stanislas,Nantes,44.0,0440163N,LGT Saint-Stanislas,95
+Sainte-Marie,Antony,92.0,0920904H,Lycée Sainte Marie,95
+Théophile-Gautier,Tarbes,65.0,0650025Z,Lycée Théophile Gautier,95
+Turgot,Paris,75.0,0750647W,Lycée Turgot,90
+Victor-Hugo,Besançon,25.0,0250007X,Lycée Victor Hugo,95
+Victor-Hugo,Caen,14.0,0142059M,Lycée Victor Hugo,95
+Wallon,Valenciennes,59.0,0590221V,Lycée Henri Wallon,90
+Assomption,Rennes,35.0,0350778F,Lycée ASSOMPTION,90
+Sainte-Anne,Brest,29.0,0290338K,Lycée Sainte Anne,95
+Rabelais,St-Brieuc,22.0,0220056S,Lycée Francois Rabelais,90
+Louis-Pasteur,Neuilly-sur-Seine,92.0,0920142E,Lycée Louis Pasteur,95
+Jean-Baptiste-Say,Paris,75.0,0750700D,Lycée Jean-Baptiste Say,95
+Jean-Perrin,Marseille,13.0,0130053M,Lycée Jean Perrin,95
+La Fayette,Clermont-Ferrand,63.0,0630021F,Lycée La Fayette,90
+Lalande,Bourg-en-Bresse,1.0,0010013J,Lycée Lalande,90
+Vauban,Brest,29.0,0290012F,Lycée Vauban,90
+Leconte-de-Lisle,St-Denis-de-La Réunion,974.0,9740001H,Lycée Leconte de Lisle,95
+Robespierre,Arras,62.0,0620006V,Lycée Robespierre,95
+Claude-Bernard,Paris,75.0,0750698B,Lycée Claude Bernard,95
+Etienne-Mimard,St-Etienne,42.0,0420046X,Lycée Etienne Mimard,95
+Jean-Bart,Dunkerque,59.0,0590071G,Lycée Jean Bart,90
+Joliot Curie,Rennes,35.0,0350029S,Lycée Joliot-Curie,95
+Les Eucalyptus,Nice,6.0,0060075Z,Lycée Les Eucalyptus,95
+Gustave-Eiffel,Bordeaux,33.0,0330028B,Lycée Gustave Eiffel,95
+César-Baggio,Lille,59.0,0590121L,Lycée Cesar Baggio,86
+Paul-Valéry,Paris,75.0,0750679F,Lycée Paul Valery,86
+Henri-Loritz,Nancy,54.0,0540042C,Lycée Henri Loritz,95
+Abulcasis,Rabat,,,,0
+Arsonval,St-Maur-des-Fossés,94.0,0940121W,Lycée D'Arsonval,90
+Baimbridge,Pointe-à-Pitre,97.0,9710003B,,0
+Camille-Vernet,Valence,26.0,0260035X,Lycée CAMILLE VERNET,95
+Cormontaigne,Metz,57.0,0573227Y,Lycée Louis De Cormontaigne,90
+Couffignal,Strasbourg,67.0,0670085D,Lycée Louis Couffignal,90
+Errazi,El Jadida,,,,0
+Frédéric-Mistral,Avignon,84.0,0840003X,Lycée Frédéric Mistral,95
+Gustave-Eiffel,Dijon,21.0,0211033J,Lycée Gustave Eiffel,95
+Ibn Al Ghazi,Rabat,,,,0
+Ibn-Timiya,Marrakech,,,,0
+Jean-Dautet,La Rochelle,17.0,0170028N,Lycée Jean Dautet,95
+Jean-Jaurès,Argenteuil,95.0,0950641F,Lycée Jean Jaures,86
+Jean-Jaurès - Condorcet,Montreuil,93.0,,,0
+Jules-Ferry,Versailles,78.0,0782565P,Lycée Jules Ferry,95
+Jules-Garnier,Nouméa,983.0,,,0
+L'Essouriau,Les Ulis,91.0,0911492C,Lycée de l'Essouriau,90
+La Résidence,Casablanca,,,,0
+Laetitia-Bonaparte,Ajaccio,20.0,6200002H,Lycée Laetitia Bonaparte,95
+Moissan,Meaux,77.0,0770930T,Lycée Henri Moissan,90
+Vaugelas,Chambéry,73.0,0730013T,Lycée Vaugelas,90
+Raspail,Paris,75.0,0750691U,Lycée Raspail,90
+Parc-des-Loges,Evry,91.0,0911251R,Lycée du Parc des Loges,90
+St-Joseph-Pierre-Rouge,Montpellier,34.0,0341521U,,0
+Léon-Gontran-Damas,Cayenne,,,,0
+Mohamed-V,Casablanca,,,,0
+Moulay Idriss,Fès,,,,0
+Moulay Youssef,Rabat,,,,0
+Omar Ibn Al-Khattab,Méknès,,,,0
+ORT,Strasbourg,67.0,0671636P,Lycée ORT STRASBOURG,90

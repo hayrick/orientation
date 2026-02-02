@@ -1,0 +1,70 @@
+export interface School {
+    uai: string;
+    name: string;
+    status: string;
+    locations: Location[];
+}
+
+export interface Location {
+    id: string;
+    city: string;
+    departmentCode: string;
+    departmentName: string;
+    region: string;
+    academy: string;
+    latitude?: number;
+    longitude?: number;
+}
+
+export interface Formation {
+    id: string;
+    name: string;
+    category: string;
+    admissionRate: number;
+    capacity: number;
+    selectivity: string;
+    school?: School;
+    location?: Location;
+    filiereFormationDetaillee?: string;
+    filiereFormationDetailleeBis?: string;
+    filiereTresDetaillee?: string;
+    parcoursupLink?: string;
+    totalCandidates?: number;
+    totalCandidatesWithAdmissionProposal?: number;
+    lastCalledRank?: number;
+    genderParity?: number;
+    mentionDistribution?: Record<string, number>;
+    panier_stats?: PanierSchoolStats[];
+}
+
+export interface Panier {
+    id: string;
+    name: string;
+    cpgeType: string;
+    url?: string;
+}
+
+export interface PanierSchoolStats {
+    id: string;
+    panierId: string;
+    schoolUai: string;
+    tauxIntegrationPct?: number;
+    moyenneBac?: number;
+    moyenneMultiAnsPct?: number;
+    rangMultiAns?: string;
+    parcoursup?: boolean;
+    admissionRate?: number;
+    parcoursupLink?: string;
+    panier?: Panier;
+    school?: School;
+}
+
+export interface MasterFormation {
+    id: string;
+    name: string;
+}
+
+export interface PanierDetail extends Panier {
+    master_formations: MasterFormation[];
+    school_stats: PanierSchoolStats[];
+}

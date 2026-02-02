@@ -1,0 +1,97 @@
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model School {
+  uai       String           @id
+  name      String
+  status    String // Public, Privé
+  locations SchoolLocation[]
+  formations Formation[]
+  panierStats PanierSchoolStats[]
+}
+
+model SchoolLocation {
+  id             String      @id // Composite: uai-city (sanitized)
+  schoolUai      String
+  city           String
+  departmentCode String
+  departmentName String
+  region         String
+  academy        String
+  latitude       Float?
+  longitude      Float?
+  
+  school         School      @relation(fields: [schoolUai], references: [uai])
+  formations     Formation[]
+}
+
+model Formation {
+  id              String         @id // "Session" cod
+  locationId      String
+  name            String
+  filiereFormationDetaillee String?
+  filiereFormationDetailleeBis String?
+  filiereTresDetaillee String?
+  parcoursupLink  String?
+  category        String
+  selectivity     String
+  capacity        Int
+  totalCandidates Int?
+  totalCandidatesWithAdmissionProposal Int?
+  
+  admissionRate   Float
+  lastCalledRank  Int?
+  genderParity    Float? // % women
+  
+  mentionDistribution String?
+
+  location        SchoolLocation @relation(fields: [locationId], references: [id])
+  
+  schoolUai       String
+  school          School         @relation(fields: [schoolUai], references: [uai])
+}
+
+model MasterFormation {
+  id      String   @id
+  name    String   @unique
+  paniers PanierMasterFormation[]
+}
+
+model Panier {
+  id               String            @id
+  name             String
+  cpgeType         String
+  url              String?
+  masterFormations PanierMasterFormation[]
+  schoolStats      PanierSchoolStats[]
+}
+
+model PanierMasterFormation {
+  panierId          String
+  masterFormationId String
+  panier            Panier          @relation(fields: [panierId], references: [id])
+  masterFormation   MasterFormation @relation(fields: [masterFormationId], references: [id])
+
+  @@id([panierId, masterFormationId])
+}
+
+model PanierSchoolStats {
+  id                 String  @id
+  panierId           String
+  schoolUai          String
+  tauxIntegrationPct Float?
+  moyenneBac         Float?
+  moyenneMultiAnsPct Float?
+  rangMultiAns       String?
+  parcoursup         Boolean?
+
+  panier             Panier @relation(fields: [panierId], references: [id])
+  school             School @relation(fields: [schoolUai], references: [uai])
+}
