@@ -100,3 +100,11 @@ class PanierSchoolStats(Base):
 
     panier = relationship("Panier", back_populates="school_stats")
     school = relationship("School", back_populates="panier_stats")
+
+class CpgeMapping(Base):
+    __tablename__ = "CpgeMapping"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    etudiantType = Column(String)
+    parcoursupFiliere = Column(String)
+    schoolUai = Column(String, nullable=True)

@@ -67,6 +67,7 @@ class PanierSchoolStatsBase(BaseModel):
     parcoursup: Optional[bool] = None
     admissionRate: Optional[float] = None
     parcoursupLink: Optional[str] = None
+    parcoursupName: Optional[str] = None
     panier: Optional[PanierBase] = None
 
     class Config:

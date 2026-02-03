@@ -362,7 +362,7 @@ export function CPGEPage() {
                     </svg>
 
                     {/* School Bubbles Grid */}
-                    <div className="relative z-10 flex flex-wrap justify-center gap-4 max-w-[700px] overflow-y-auto max-h-[calc(100vh-280px)] px-4 pb-8">
+                    <div className="relative z-10 flex flex-wrap justify-center gap-5 max-w-[900px] overflow-y-auto overflow-x-visible max-h-[calc(100vh-280px)] px-8 pt-6 pb-8 m-2">
                         {allSchools.slice(0, 20).map((school, idx) => {
                             const expected = school.moyenneBac;
                             const diff = expected ? studentGrade - expected : null;
@@ -483,6 +483,7 @@ export function CPGEPage() {
                                 const schoolHoveredStats = hoveredSchoolId ? panier.school_stats.find(s => s.schoolUai === hoveredSchoolId) : null;
                                 const isCibled = !!schoolHoveredStats;
                                 const isLarge = panier.name.toLowerCase().includes('large');
+                                const isTop8 = panier.name.toLowerCase().includes('top 8');
 
                                 return (
                                     <motion.div
@@ -545,8 +546,8 @@ export function CPGEPage() {
                                             )}
                                         </div>
 
-                                        {/* MasterFormations - only show for "panier large" */}
-                                        {isLarge && panier.master_formations.length > 0 && (
+                                        {/* MasterFormations - show for "panier large" and "Top 8" */}
+                                        {(isLarge || isTop8) && panier.master_formations.length > 0 && (
                                             <div className="mb-3">
                                                 <div className="text-[9px] text-white/40 uppercase tracking-wider mb-1">Grandes Écoles</div>
                                                 <div className="flex flex-wrap gap-1">

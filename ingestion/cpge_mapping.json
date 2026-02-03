@@ -1,0 +1,107 @@
+[
+  {
+    "etudiantType": "MP",
+    "parcoursupFiliere": "MPSI",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "PC",
+    "parcoursupFiliere": "PCSI",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "PT",
+    "parcoursupFiliere": "PTSI",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "PSI",
+    "parcoursupFiliere": "MPSI",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "PSI",
+    "parcoursupFiliere": "PCSI",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "PSI",
+    "parcoursupFiliere": "PTSI",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "MPI",
+    "parcoursupFiliere": "MP2I",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "BCPST",
+    "parcoursupFiliere": "BCPST",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG",
+    "parcoursupFiliere": "ECG - Mathématiques appliquées + ESH",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG",
+    "parcoursupFiliere": "ECG - Mathématiques appliquées + HGG",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG",
+    "parcoursupFiliere": "ECG - Mathématiques approfondies + ESH",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG",
+    "parcoursupFiliere": "ECG - Mathématiques approfondies + HGG",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG - Mathématiques appliquées + ESH",
+    "parcoursupFiliere": "ECG - Mathématiques appliquées + ESH",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG - Mathématiques appliquées + HGG",
+    "parcoursupFiliere": "ECG - Mathématiques appliquées + HGG",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG - Mathématiques approfondies + ESH",
+    "parcoursupFiliere": "ECG - Mathématiques approfondies + ESH",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG - Mathématiques approfondies + HGG",
+    "parcoursupFiliere": "ECG - Mathématiques approfondies + HGG",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "B/L - Lettres et sciences sociales",
+    "parcoursupFiliere": "B/L - Lettres et sciences sociales",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "Lettres",
+    "parcoursupFiliere": "Lettres",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "A/L",
+    "parcoursupFiliere": "Lettres",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "LSH",
+    "parcoursupFiliere": "Lettres",
+    "schoolUai": null
+  },
+  {
+    "etudiantType": "ECG - Mathématiques appliquées + HGG",
+    "parcoursupFiliere": "ECG - Mathématiques appliquées + ESH",
+    "schoolUai": "0750699C"
+  }
+]

@@ -55,6 +55,7 @@ export interface PanierSchoolStats {
     parcoursup?: boolean;
     admissionRate?: number;
     parcoursupLink?: string;
+    parcoursupName?: string;
     panier?: Panier;
     school?: School;
 }

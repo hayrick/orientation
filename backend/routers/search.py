@@ -9,16 +9,29 @@ router = APIRouter(
     tags=["formations"]
 )
 
-def get_parcoursup_types(cpge_type: str) -> List[str]:
+def get_parcoursup_types(cpge_type: str, db: Session, school_uai: Optional[str] = None) -> List[str]:
     """
-    Map scraper CPGE types to Parcoursup formation names.
-    Many scraper types are specific subtypes, while Parcoursup uses generic names.
-    Returns a list of potential matches for ilike queries.
+    Map scraper CPGE types to Parcoursup formation names using CpgeMapping table.
     """
-    # Normalize
-    t = cpge_type.upper()
+    # 1. Check for school-specific overrides
+    if school_uai:
+        overrides = db.query(models.CpgeMapping.parcoursupFiliere)\
+            .filter(models.CpgeMapping.etudiantType == cpge_type)\
+            .filter(models.CpgeMapping.schoolUai == school_uai)\
+            .all()
+        if overrides:
+            return [o[0] for o in overrides]
+
+    # 2. Check for global mappings
+    global_mappings = db.query(models.CpgeMapping.parcoursupFiliere)\
+        .filter(models.CpgeMapping.etudiantType == cpge_type)\
+        .filter(models.CpgeMapping.schoolUai == None)\
+        .all()
+    if global_mappings:
+        return [g[0] for g in global_mappings]
     
-    # Mapping logic
+    # 3. Fallback to hardcoded logic if no mapping exists
+    t = cpge_type.upper()
     if "LETTRES" in t or "B/L" in t or "A/L" in t or "LSH" in t:
         return ["Lettres", "B/L", "A/L"]
     
@@ -28,7 +41,6 @@ def get_parcoursup_types(cpge_type: str) -> List[str]:
     if "BCPST" in t:
         return ["BCPST"]
         
-    # Default: return the type itself and some basic variants
     return [cpge_type]
 
 @router.get("/categories", response_model=List[str])
@@ -70,17 +82,40 @@ def get_paniers_by_type(cpge_type: str = Query(..., description="The CPGE type f
     
     # Build admission rates map
     rates_map = {}
+    # Track schools that should be excluded due to override mappings
+    schools_to_exclude = set()
     if uai_list:
-        psup_types = get_parcoursup_types(cpge_type)
+        from sqlalchemy import or_
         
-        # Build OR filter for types
+        # We need to consider both global mappings and school-specific overrides
+        global_filieres = get_parcoursup_types(cpge_type, db)
+        
+        # Get all relevant formations for these schools
+        # We'll filter them properly in Python to handle school-specific overrides accurately
+        psup_search_terms = set(global_filieres)
+        # Add potential overrides for these schools
+        overrides = db.query(models.CpgeMapping)\
+            .filter(models.CpgeMapping.etudiantType == cpge_type)\
+            .filter(models.CpgeMapping.schoolUai.in_(uai_list))\
+            .all()
+        
+        school_overrides = {}
+        for o in overrides:
+            psup_search_terms.add(o.parcoursupFiliere)
+            if o.schoolUai not in school_overrides:
+                school_overrides[o.schoolUai] = []
+            school_overrides[o.schoolUai].append(o.parcoursupFiliere)
+            # If the override maps to a different filiere, exclude this school
+            # because l'Etudiant has incorrectly categorized it
+            if o.parcoursupFiliere not in global_filieres:
+                schools_to_exclude.add(o.schoolUai)
+
         type_filters = []
-        for t in psup_types:
+        for t in psup_search_terms:
             type_filters.append(models.Formation.filiereFormationDetailleeBis.ilike(f"%{t}%"))
             type_filters.append(models.Formation.filiereFormationDetaillee.ilike(f"%{t}%"))
             type_filters.append(models.Formation.name.ilike(f"%{t}%"))
 
-        from sqlalchemy import or_
         formations = db.query(models.Formation)\
             .filter(models.Formation.schoolUai.in_(uai_list))\
             .filter(models.Formation.category.ilike("%CPGE%"))\
@@ -88,11 +123,25 @@ def get_paniers_by_type(cpge_type: str = Query(..., description="The CPGE type f
             .all()
         
         for f in formations:
-            if f.schoolUai not in rates_map and f.admissionRate is not None:
-                rates_map[f.schoolUai] = {
-                    "admissionRate": f.admissionRate,
-                    "parcoursupLink": f.parcoursupLink
-                }
+            # Determine target filieres for this specific school
+            targets = school_overrides.get(f.schoolUai, global_filieres)
+            
+            # Check if this formation matches any of the targets
+            is_match = False
+            for target in targets:
+                if (f.filiereFormationDetailleeBis and target.lower() in f.filiereFormationDetailleeBis.lower()) or \
+                   (f.filiereFormationDetaillee and target.lower() in f.filiereFormationDetaillee.lower()) or \
+                   (target.lower() in f.name.lower()):
+                    is_match = True
+                    break
+            
+            if is_match:
+                if f.schoolUai not in rates_map and f.admissionRate is not None:
+                    rates_map[f.schoolUai] = {
+                        "admissionRate": f.admissionRate,
+                        "parcoursupLink": f.parcoursupLink,
+                        "parcoursupName": f.filiereFormationDetailleeBis or f.name
+                    }
     
     # Manually construct response to include admission rates
     result = []
@@ -126,6 +175,18 @@ def get_paniers_by_type(cpge_type: str = Query(..., description="The CPGE type f
                     ]
                 }
             
+            admission_info = rates_map.get(s.schoolUai, {})
+            admission_rate = admission_info.get("admissionRate")
+            
+            # ONLY include schools that were successfully mapped (have an admission rate)
+            if admission_rate is None:
+                continue
+            
+            # Exclude schools that have a school-specific override to a different type
+            # This means l'Etudiant incorrectly categorized this school under this type
+            if s.schoolUai in schools_to_exclude:
+                continue
+
             stat_dict = {
                 "id": s.id,
                 "panierId": s.panierId,
@@ -135,12 +196,16 @@ def get_paniers_by_type(cpge_type: str = Query(..., description="The CPGE type f
                 "moyenneMultiAnsPct": s.moyenneMultiAnsPct,
                 "rangMultiAns": s.rangMultiAns,
                 "parcoursup": s.parcoursup,
-                "admissionRate": rates_map.get(s.schoolUai, {}).get("admissionRate"),  # Inject admission rate
-                "parcoursupLink": rates_map.get(s.schoolUai, {}).get("parcoursupLink"),  # Inject parcoursup link
+                "admissionRate": admission_rate,
+                "parcoursupLink": admission_info.get("parcoursupLink"),
+                "parcoursupName": admission_info.get("parcoursupName"),
                 "school": school_data
             }
             panier_dict["school_stats"].append(stat_dict)
-        result.append(panier_dict)
+        
+        # Only add the panier if it has at least one relevant school
+        if panier_dict["school_stats"]:
+            result.append(panier_dict)
     
     return result
 
@@ -179,9 +244,16 @@ def search_formations(
         query = query.filter(models.Formation.admissionRate >= min_admission_rate)
     
     if filiere_bis:
-        # Filter by list of filieres (OR logic within the list usually, or strict match? 
-        # Usually multiple selection implies IN clause)
-        query = query.filter(models.Formation.filiereFormationDetailleeBis.in_(filiere_bis))
+        from sqlalchemy import or_
+        expanded_types = []
+        for f in filiere_bis:
+            expanded_types.extend(get_parcoursup_types(f, db))
+        
+        type_filters = []
+        for t in set(expanded_types):
+            type_filters.append(models.Formation.filiereFormationDetailleeBis.ilike(f"%{t}%"))
+        
+        query = query.filter(or_(*type_filters))
 
     # Calculate total before pagination
     total = query.count()

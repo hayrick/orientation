@@ -95,3 +95,12 @@ model PanierSchoolStats {
   panier             Panier @relation(fields: [panierId], references: [id])
   school             School @relation(fields: [schoolUai], references: [uai])
 }
+
+model CpgeMapping {
+  id                Int     @id @default(autoincrement())
+  etudiantType      String  // e.g. "PSI", "ECG - Mathématiques appliquées + HGG"
+  parcoursupFiliere String // e.g. "PCSI", "ECG - Mathématiques appliquées + ESH"
+  schoolUai         String? // NULL for Type 1 (Global), contains UAI for Type 2 (Override)
+  
+  @@unique([etudiantType, schoolUai])
+}

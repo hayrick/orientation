@@ -57,6 +57,10 @@ verify*.py
 check*.py
 analyze*.py
 inspect*.py
+investigate*.py
+list*.py
+find*.py
+generate*.py
 reproduction.py
 backend/.venv/
 frontend/dist/
