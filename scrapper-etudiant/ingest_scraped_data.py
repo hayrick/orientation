@@ -41,13 +41,22 @@ def ingest():
 
     print("--- Starting Ingestion ---")
 
-    # 1. Load Mapping
+    # 1. Load Mapping - use (name, city, dept) as key to avoid collisions
+    # (e.g., Henri-IV Paris vs Henri-IV Béziers)
     mapping_path = os.path.join(OUTPUT_DIR, "mapping.csv")
     df_mapping = pd.read_csv(mapping_path)
     # Filter only matched schools
     df_mapping = df_mapping[df_mapping['matched_uai'].notna() & (df_mapping['matched_uai'] != "")]
-    name_to_uai = dict(zip(df_mapping['scraped_name'], df_mapping['matched_uai']))
-    print(f"Loaded {len(name_to_uai)} school mappings.")
+    
+    # Create composite key mapping: (name, city, dept) -> uai
+    name_city_dept_to_uai = {}
+    for _, row in df_mapping.iterrows():
+        name = row['scraped_name']
+        city = str(row.get('scraped_city', '')).strip()
+        dept = str(row.get('scraped_dept', '')).replace('.0', '').strip()  # Remove .0 suffix from float
+        uai = row['matched_uai']
+        name_city_dept_to_uai[(name, city, dept)] = uai
+    print(f"Loaded {len(name_city_dept_to_uai)} school mappings.")
 
     # 1b. Load CPGE Redirections (Type 2 Overrides)
     # These are used to fix data errors on l'Etudiant (e.g. Janson in HGG instead of ESH)
@@ -127,7 +136,11 @@ def ingest():
     
     for idx, row in df_stats.iterrows():
         scraped_name = row['school_name']
-        uai = name_to_uai.get(scraped_name)
+        scraped_city = str(row.get('city', '')).strip()
+        scraped_dept = str(row.get('department', '')).replace('.0', '').strip()  # Remove .0 suffix
+        
+        # Lookup using composite key (name, city, dept)
+        uai = name_city_dept_to_uai.get((scraped_name, scraped_city, scraped_dept))
         
         if not uai:
             skipped_unmatched += 1
