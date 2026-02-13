@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
-import { GraduationCap, School as SchoolIcon, Trophy, Info, Home, Heart, BarChart2, PieChart, UserCircle, Loader2, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { GraduationCap, School as SchoolIcon, Trophy, Info, Home, Loader2, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PanierDetail, PanierSchoolStats } from '../types';
+import { PanierDetail, PanierSchoolStats, Specialty, SpecialtyAdmissionRate } from '../types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -23,6 +24,12 @@ export function CPGEPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [hoveredSchoolId, setHoveredSchoolId] = useState<string | null>(null);
+
+    // Specialty selection state
+    const [specialties, setSpecialties] = useState<Specialty[]>([]);
+    const [specialty1, setSpecialty1] = useState<string>('');
+    const [specialty2, setSpecialty2] = useState<string>('');
+    const [admissionRates, setAdmissionRates] = useState<Record<string, SpecialtyAdmissionRate>>({});
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const zoneRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -47,6 +54,41 @@ export function CPGEPage() {
             })
             .finally(() => setLoading(false));
     }, []);
+
+    // Fetch available specialties
+    useEffect(() => {
+        fetch(`${API_URL}/specialties/`)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setSpecialties(data);
+                    // Set default selections (most common: Maths + Physics-Chem)
+                    if (data.length >= 2) {
+                        const maths = data.find((s: Specialty) => s.id === 'maths');
+                        const physChem = data.find((s: Specialty) => s.id === 'physique-chimie');
+                        if (maths) setSpecialty1(maths.id);
+                        if (physChem) setSpecialty2(physChem.id);
+                    }
+                }
+            })
+            .catch(err => console.error("Failed to fetch specialties", err));
+    }, []);
+
+    // Fetch admission rates when specialties change
+    useEffect(() => {
+        if (specialty1 && specialty2 && specialty1 !== specialty2) {
+            fetch(`${API_URL}/specialties/admission-rates-by-specialties?specialty1=${specialty1}&specialty2=${specialty2}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && typeof data === 'object') {
+                        setAdmissionRates(data);
+                    }
+                })
+                .catch(err => console.error("Failed to fetch admission rates", err));
+        } else {
+            setAdmissionRates({});
+        }
+    }, [specialty1, specialty2]);
 
     // Fetch data for selected type
     useEffect(() => {
@@ -132,38 +174,84 @@ export function CPGEPage() {
 
     return (
         <div className="min-h-screen bg-transparent text-white selection:bg-blue-500/30 overflow-hidden font-sans">
-            {/* Title Banner */}
-            <div className="fixed top-0 left-0 right-0 z-50 py-3 text-center">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-white/40 uppercase">CPGE Type</span>
-                <div className="flex justify-center gap-2 mt-2">
-                    {types.map(type => (
-                        <button
-                            key={type}
-                            onClick={() => setSelectedType(type)}
-                            className={cn(
-                                "px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border",
-                                selectedType === type
-                                    ? "bg-cyan-500/20 border-cyan-400/50 text-cyan-300 glow-cyan"
-                                    : "bg-white/5 border-white/10 text-white/50 hover:text-white hover:border-white/30"
-                            )}
-                        >
-                            {type}
-                        </button>
-                    ))}
+            {/* Top Bar: Specialty Filters (left) + CPGE Type Buttons (center) + Dept Filter (right) */}
+            <div className="fixed top-0 left-0 right-0 z-50 py-2 px-4 flex items-center justify-between">
+                {/* Left: Specialty Dropdowns */}
+                <div className="flex items-center gap-2">
+                    <select
+                        value={specialty1}
+                        onChange={(e) => setSpecialty1(e.target.value)}
+                        className="bg-purple-500/10 border border-purple-400/30 rounded-lg px-2 py-1 text-xs font-medium text-purple-200 focus:ring-2 focus:ring-purple-500 outline-none hover:bg-purple-500/20 transition-all cursor-pointer"
+                    >
+                        <option value="" className="bg-slate-900">Spé 1</option>
+                        {specialties.filter(s => s.id !== specialty2).map(spec => (
+                            <option key={spec.id} value={spec.id} className="bg-slate-900">
+                                {spec.shortName}
+                            </option>
+                        ))}
+                    </select>
+                    <span className="text-white/30">+</span>
+                    <select
+                        value={specialty2}
+                        onChange={(e) => setSpecialty2(e.target.value)}
+                        className="bg-purple-500/10 border border-purple-400/30 rounded-lg px-2 py-1 text-xs font-medium text-purple-200 focus:ring-2 focus:ring-purple-500 outline-none hover:bg-purple-500/20 transition-all cursor-pointer"
+                    >
+                        <option value="" className="bg-slate-900">Spé 2</option>
+                        {specialties.filter(s => s.id !== specialty1).map(spec => (
+                            <option key={spec.id} value={spec.id} className="bg-slate-900">
+                                {spec.shortName}
+                            </option>
+                        ))}
+                    </select>
                 </div>
-            </div>
 
-            {/* Page Title + Department Filter */}
-            <div className="fixed top-24 left-0 right-0 z-40 flex items-center justify-center gap-8">
-                <h1 className="text-2xl font-bold tracking-wide text-white/90">
-                    Plateforme d'Orientation <span className="text-cyan-400">CPGE</span>
-                </h1>
+                {/* Center: CPGE Type Buttons */}
+                <div className="flex gap-2 flex-wrap justify-center">
+                    {types.map(type => {
+                        const rate = admissionRates[type];
+                        // Shorten the labels
+                        const shortLabel = type
+                            .replace('Mathématiques', 'Maths')
+                            .replace('Lettres et sciences sociales', 'B/L')
+                            .replace('Économique et commerciale', 'ECG')
+                            .replace('Lettres', 'Lettres');
+                        return (
+                            <div key={type} className="relative">
+                                <button
+                                    onClick={() => setSelectedType(type)}
+                                    className={cn(
+                                        "px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 border",
+                                        selectedType === type
+                                            ? "bg-cyan-500/20 border-cyan-400/50 text-cyan-300 glow-cyan"
+                                            : "bg-white/5 border-white/10 text-white/50 hover:text-white hover:border-white/30"
+                                    )}
+                                >
+                                    {shortLabel}
+                                </button>
+                                {rate?.admissionRatePct && (
+                                    <div className={cn(
+                                        "absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black border shadow-lg",
+                                        rate.admissionRatePct >= 70
+                                            ? "bg-green-500/30 border-green-400/50 text-green-300"
+                                            : rate.admissionRatePct >= 50
+                                                ? "bg-yellow-500/30 border-yellow-400/50 text-yellow-300"
+                                                : "bg-orange-500/30 border-orange-400/50 text-orange-300"
+                                    )}>
+                                        {rate.admissionRatePct.toFixed(0)}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Right: Department Filter */}
                 <select
                     value={selectedDept}
                     onChange={(e) => setSelectedDept(e.target.value)}
-                    className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:ring-2 focus:ring-cyan-500 outline-none hover:bg-white/15 transition-all cursor-pointer"
+                    className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-xs font-medium text-white focus:ring-2 focus:ring-cyan-500 outline-none hover:bg-white/15 transition-all cursor-pointer"
                 >
-                    <option value="" className="bg-slate-900">Tous les départements</option>
+                    <option value="" className="bg-slate-900">Département</option>
                     {availableDepts.map(dept => (
                         <option key={dept.code} value={dept.code} className="bg-slate-900">
                             {dept.code} - {dept.name}
@@ -181,13 +269,13 @@ export function CPGEPage() {
 
             {/* Error State */}
             {error && (
-                <div className="fixed top-36 left-1/2 -translate-x-1/2 z-[100] bg-red-500/20 border border-red-500/50 rounded-xl px-6 py-3 text-sm text-red-300">
+                <div className="fixed top-14 left-1/2 -translate-x-1/2 z-[100] bg-red-500/20 border border-red-500/50 rounded-xl px-6 py-3 text-sm text-red-300">
                     {error}
                 </div>
             )}
 
             {/* Main Content */}
-            <main ref={containerRef} className="pt-36 pb-24 h-screen grid grid-cols-[140px_1fr_400px] relative overflow-hidden">
+            <main ref={containerRef} className="pt-14 pb-24 h-screen grid grid-cols-[140px_1fr_400px] relative overflow-hidden">
 
                 {/* ZONE 1: GRADE SLIDER */}
                 <div className="h-[calc(100%-120px)] flex flex-col items-center justify-center px-6">
@@ -364,29 +452,83 @@ export function CPGEPage() {
                     {/* School Bubbles Grid */}
                     <div className="relative z-10 flex flex-wrap justify-center gap-5 max-w-[900px] overflow-y-auto overflow-x-visible max-h-[calc(100vh-280px)] px-8 pt-6 pb-8 m-2">
                         {allSchools.slice(0, 20).map((school, idx) => {
-                            const expected = school.moyenneBac;
-                            const diff = expected ? studentGrade - expected : null;
+                            // Get the expected grade - fallback logic:
+                            // 1. Use moyenneBac from this school/type
+                            // 2. Try to find moyenneBac from same school, different CPGE type
+                            // 3. Default to 15
+                            let expected = school.moyenneBac;
+                            if (!expected) {
+                                // Try to find another stat from the same school
+                                const otherStat = allSchools.find(
+                                    s => s.schoolUai === school.schoolUai && s.moyenneBac && s !== school
+                                );
+                                expected = otherStat?.moyenneBac ?? 15;
+                            }
+
+                            const gradeDiff = studentGrade - expected;
                             const isHovered = hoveredSchoolId === school.schoolUai;
                             const IconComponent = schoolIcons[idx % schoolIcons.length];
+
+                            // Get the specialty admission rate for the selected CPGE type
+                            const specialtyRate = admissionRates[selectedType]?.admissionRatePct ?? null;
+
+                            // Custom grade score mapping with linear interpolation:
+                            // diff = -3 → 10, -2 → 35, -1 → 50, 0 → 70, +1 → 90, +2 → 100
+                            const gradePoints = [
+                                { diff: -3, score: 10 },
+                                { diff: -2, score: 35 },
+                                { diff: -1, score: 50 },
+                                { diff: 0, score: 70 },
+                                { diff: 1, score: 90 },
+                                { diff: 2, score: 100 },
+                            ];
+                            let gradeScore = gradeDiff <= -3 ? 10 : gradeDiff >= 2 ? 100 : 50;
+                            for (let i = 0; i < gradePoints.length - 1; i++) {
+                                const p1 = gradePoints[i];
+                                const p2 = gradePoints[i + 1];
+                                if (gradeDiff >= p1.diff && gradeDiff <= p2.diff) {
+                                    const t = (gradeDiff - p1.diff) / (p2.diff - p1.diff);
+                                    gradeScore = p1.score + t * (p2.score - p1.score);
+                                    break;
+                                }
+                            }
+
+                            // Specialty score: already 0-100
+                            const specialtyScore = specialtyRate ?? 50; // Default to 50% if no data
+
+                            // Weighted combined score (0-100): 50% grade + 50% specialty
+                            const combinedScore = gradeScore * 0.5 + specialtyScore * 0.5;
 
                             let statusClass = "border-gray-500/30 from-gray-500/10 to-gray-600/5";
                             let textClass = "text-gray-400";
                             let iconClass = "text-gray-500";
 
-                            if (diff !== null) {
-                                if (diff >= -0.5) {
-                                    statusClass = "border-emerald-500/30 from-emerald-500/10 to-emerald-600/5";
-                                    textClass = "text-emerald-400";
-                                    iconClass = "text-emerald-400";
-                                } else if (diff >= -1.0) {
-                                    statusClass = "border-amber-500/30 from-amber-500/10 to-amber-600/5";
-                                    textClass = "text-amber-400";
-                                    iconClass = "text-amber-400";
-                                } else {
-                                    statusClass = "border-red-500/30 from-red-500/10 to-red-600/5";
-                                    textClass = "text-red-400";
-                                    iconClass = "text-red-400";
-                                }
+                            // Color based on combined score
+                            if (combinedScore > 80) {
+                                // Bright green
+                                statusClass = "border-green-400/50 from-green-400/20 to-green-500/10";
+                                textClass = "text-green-300";
+                                iconClass = "text-green-300";
+                            } else if (combinedScore > 60) {
+                                // Green
+                                statusClass = "border-emerald-500/30 from-emerald-500/10 to-emerald-600/5";
+                                textClass = "text-emerald-400";
+                                iconClass = "text-emerald-400";
+                            } else if (combinedScore > 50) {
+                                // Amber
+                                statusClass = "border-amber-500/30 from-amber-500/10 to-amber-600/5";
+                                textClass = "text-amber-400";
+                                iconClass = "text-amber-400";
+                            } else if (combinedScore > 40) {
+                                // Dark amber
+                                statusClass = "border-orange-500/30 from-orange-500/10 to-orange-600/5";
+                                textClass = "text-orange-400";
+                                iconClass = "text-orange-400";
+                            } else {
+                                // Red (< 35, with buffer zone 35-40 as dark amber)
+                                statusClass = "border-red-500/30 from-red-500/10 to-red-600/5";
+                                textClass = "text-red-400";
+                                iconClass = "text-red-400";
                             }
 
                             return (
@@ -589,17 +731,21 @@ export function CPGEPage() {
             </main>
 
             {/* Bottom Navigation */}
-            <nav className="fixed bottom-0 left-0 right-0 h-16 glass-strong border-t border-white/10 flex items-center justify-center gap-8 z-50">
-                <NavItem icon={<Home className="w-4 h-4" />} label="Accueil" />
-                <NavItem icon={<Heart className="w-4 h-4" />} label="Mes Vœux" />
-                <NavItem icon={<BarChart2 className="w-4 h-4" />} label="Simulations" active />
-                <NavItem icon={<PieChart className="w-4 h-4" />} label="Statistiques" />
-                <NavItem icon={<UserCircle className="w-4 h-4" />} label="Profil" />
-
-                <div className="absolute right-8 flex items-center gap-2 text-xs text-white/40">
-                    <GraduationCap className="w-4 h-4 text-cyan-400" />
-                    <span>Étudiant(e) CPGE</span>
-                </div>
+            <nav className="fixed bottom-0 left-0 right-0 h-14 glass-strong border-t border-white/10 flex items-center justify-center gap-4 z-50">
+                <Link
+                    to="/"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                >
+                    <Home className="w-4 h-4" />
+                    <span className="text-sm font-medium">Accueil</span>
+                </Link>
+                <Link
+                    to="/licences"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-400/30 text-purple-300 hover:bg-purple-500/20 transition-all"
+                >
+                    <GraduationCap className="w-4 h-4" />
+                    <span className="text-sm font-medium">Licences</span>
+                </Link>
             </nav>
         </div>
     );

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { SearchFilters } from './components/SearchFilters';
 import { FormationCard } from './components/FormationCard';
 import { FormationDetailModal } from './components/FormationDetailModal';
 import { CPGEPage } from './components/CPGEPage';
+import { LicencesPage } from './components/LicencesPage';
 import { Formation } from './types';
 import { Loader2, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
 
@@ -184,10 +185,14 @@ function HomePage() {
     );
 }
 
-function App() {
+function AppContent() {
+    const location = useLocation();
+    const isFullscreenPage = location.pathname === '/cpge-explorer' || location.pathname === '/licences';
+
     return (
-        <BrowserRouter>
-            <div className="min-h-screen bg-[#111827] text-white">
+        <div className="min-h-screen bg-[#111827] text-white">
+            {/* Only show header on non-fullscreen pages */}
+            {!isFullscreenPage && (
                 <header className="border-b border-gray-800 bg-[#1F2937]/50 backdrop-blur-md sticky top-0 z-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                         <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
@@ -213,12 +218,21 @@ function App() {
                         </nav>
                     </div>
                 </header>
+            )}
 
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/cpge-explorer" element={<CPGEPage />} />
-                </Routes>
-            </div>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/cpge-explorer" element={<CPGEPage />} />
+                <Route path="/licences" element={<LicencesPage />} />
+            </Routes>
+        </div>
+    );
+}
+
+function App() {
+    return (
+        <BrowserRouter>
+            <AppContent />
         </BrowserRouter>
     );
 }

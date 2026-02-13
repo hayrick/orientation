@@ -69,3 +69,16 @@ export interface PanierDetail extends Panier {
     master_formations: MasterFormation[];
     school_stats: PanierSchoolStats[];
 }
+
+export interface Specialty {
+    id: string;
+    name: string;
+    shortName: string;
+}
+
+export interface SpecialtyAdmissionRate {
+    admissionRatePct: number | null;
+    candidats: number;
+    cpgeCategory: string;
+}
+
