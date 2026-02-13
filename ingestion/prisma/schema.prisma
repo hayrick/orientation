@@ -104,3 +104,42 @@ model CpgeMapping {
   
   @@unique([etudiantType, schoolUai])
 }
+
+// ============================================
+// Specialty Admission Data Tables
+// ============================================
+
+// Reference table of high school specialties
+model Specialty {
+  id        String @id  // e.g., 'maths', 'physique-chimie', 'ses'
+  name      String      // Full name: "Mathématiques Spécialité"
+  shortName String?     // Short name: "Maths"
+  
+  stats1    SpecialtyAdmissionStats[] @relation("Specialty1")
+  stats2    SpecialtyAdmissionStats[] @relation("Specialty2")
+}
+
+// Maps simplified CPGE categories (from CSV) to our detailed cpgeTypes
+model CpgeCategoryMapping {
+  id          Int    @id @default(autoincrement())
+  csvCategory String // 'CPGE ECG', 'CPGE L', 'CPGE S'
+  cpgeType    String // Our detailed cpgeType e.g. 'ECG - Mathématiques appliquées + ESH'
+  
+  @@unique([csvCategory, cpgeType])
+}
+
+// Admission statistics by specialty combination
+model SpecialtyAdmissionStats {
+  id               String @id  // e.g., 'maths-ses-cpge-ecg'
+  specialty1Id     String
+  specialty2Id     String
+  cpgeCategory     String      // 'CPGE ECG', 'CPGE L', 'CPGE S'
+  candidats        Int         // Total candidates with this combo
+  propositions     Float       // Candidates who received an offer
+  acceptes         Int         // Candidates who accepted
+  admissionRatePct Float?      // propositions / candidats * 100
+  
+  specialty1       Specialty @relation("Specialty1", fields: [specialty1Id], references: [id])
+  specialty2       Specialty @relation("Specialty2", fields: [specialty2Id], references: [id])
+}
+

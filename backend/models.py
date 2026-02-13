@@ -108,3 +108,37 @@ class CpgeMapping(Base):
     etudiantType = Column(String)
     parcoursupFiliere = Column(String)
     schoolUai = Column(String, nullable=True)
+
+# ============================================
+# Specialty Admission Data Models
+# ============================================
+
+class Specialty(Base):
+    __tablename__ = "Specialty"
+
+    id = Column(String, primary_key=True)
+    name = Column(String)
+    shortName = Column(String, nullable=True)
+
+class CpgeCategoryMapping(Base):
+    __tablename__ = "CpgeCategoryMapping"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    csvCategory = Column(String)  # 'CPGE ECG', 'CPGE L', 'CPGE S'
+    cpgeType = Column(String)     # Our detailed cpgeType
+
+class SpecialtyAdmissionStats(Base):
+    __tablename__ = "SpecialtyAdmissionStats"
+
+    id = Column(String, primary_key=True)
+    specialty1Id = Column(String, ForeignKey("Specialty.id"))
+    specialty2Id = Column(String, ForeignKey("Specialty.id"))
+    cpgeCategory = Column(String)
+    candidats = Column(Integer)
+    propositions = Column(Float)
+    acceptes = Column(Integer)
+    admissionRatePct = Column(Float, nullable=True)
+
+    specialty1 = relationship("Specialty", foreign_keys=[specialty1Id])
+    specialty2 = relationship("Specialty", foreign_keys=[specialty2Id])
+
