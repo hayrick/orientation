@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import search
+from .routers import search, licences
 
 app = FastAPI(title="Orientation API")
 
@@ -20,6 +20,8 @@ app.add_middleware(
 
 app.include_router(search.router)
 app.include_router(search.school_router)
+app.include_router(search.specialty_router)
+app.include_router(licences.router)
 
 @app.get("/health")
 def health_check():

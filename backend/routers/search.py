@@ -295,3 +295,107 @@ def get_school(uai: str, db: Session = Depends(get_db)):
     if not school:
         raise HTTPException(status_code=404, detail="School not found")
     return school
+
+# ============================================
+# Specialty Admission Data Endpoints
+# ============================================
+
+specialty_router = APIRouter(
+    prefix="/specialties",
+    tags=["specialties"]
+)
+
+@specialty_router.get("/", response_model=List[dict])
+def get_specialties(db: Session = Depends(get_db)):
+    """Return all available high school specialties"""
+    specialties = db.query(models.Specialty).all()
+    return [{"id": s.id, "name": s.name, "shortName": s.shortName} for s in specialties]
+
+@specialty_router.get("/admission-rate")
+def get_specialty_admission_rate(
+    specialty1: str = Query(..., description="First specialty ID (e.g., 'maths')"),
+    specialty2: str = Query(..., description="Second specialty ID (e.g., 'ses')"),
+    cpge_type: str = Query(..., description="CPGE type (e.g., 'ECG', 'MP')"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get admission rate for a specific specialty combination and CPGE type.
+    Returns the percentage of candidates with this specialty combo who received an admission offer.
+    """
+    # Map our cpgeType to CSV category using CpgeCategoryMapping
+    mapping = db.query(models.CpgeCategoryMapping)\
+        .filter(models.CpgeCategoryMapping.cpgeType == cpge_type)\
+        .first()
+    
+    if not mapping:
+        # Try to infer category from type name
+        if 'ECG' in cpge_type.upper():
+            csv_category = 'CPGE ECG'
+        elif any(x in cpge_type.upper() for x in ['MP', 'MPI', 'PC', 'PSI', 'BCPST', 'PT']):
+            csv_category = 'CPGE S'
+        elif any(x in cpge_type.upper() for x in ['LETTRES', 'B/L', 'A/L', 'LSH']):
+            csv_category = 'CPGE L'
+        else:
+            return {"admissionRatePct": None, "candidats": 0, "message": "Unknown CPGE type"}
+    else:
+        csv_category = mapping.csvCategory
+    
+    # Sort specialty IDs for consistent lookup
+    spec1, spec2 = sorted([specialty1.lower(), specialty2.lower()])
+    
+    # Query the stats
+    stats = db.query(models.SpecialtyAdmissionStats)\
+        .filter(models.SpecialtyAdmissionStats.specialty1Id == spec1)\
+        .filter(models.SpecialtyAdmissionStats.specialty2Id == spec2)\
+        .filter(models.SpecialtyAdmissionStats.cpgeCategory == csv_category)\
+        .first()
+    
+    if not stats:
+        return {"admissionRatePct": None, "candidats": 0, "message": "No data for this combination"}
+    
+    return {
+        "admissionRatePct": round(stats.admissionRatePct, 1) if stats.admissionRatePct else None,
+        "candidats": stats.candidats,
+        "propositions": int(stats.propositions),
+        "cpgeCategory": csv_category
+    }
+
+@specialty_router.get("/admission-rates-by-specialties")
+def get_admission_rates_by_specialties(
+    specialty1: str = Query(..., description="First specialty ID"),
+    specialty2: str = Query(..., description="Second specialty ID"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get admission rates for ALL CPGE types given a specialty combination.
+    Returns a map of cpgeType -> admissionRatePct for display on type buttons.
+    """
+    spec1, spec2 = sorted([specialty1.lower(), specialty2.lower()])
+    
+    # Get all stats for this specialty pair
+    stats_list = db.query(models.SpecialtyAdmissionStats)\
+        .filter(models.SpecialtyAdmissionStats.specialty1Id == spec1)\
+        .filter(models.SpecialtyAdmissionStats.specialty2Id == spec2)\
+        .all()
+    
+    # Get all category mappings
+    mappings = db.query(models.CpgeCategoryMapping).all()
+    category_to_types = {}
+    for m in mappings:
+        if m.csvCategory not in category_to_types:
+            category_to_types[m.csvCategory] = []
+        category_to_types[m.csvCategory].append(m.cpgeType)
+    
+    # Build response: cpgeType -> rate
+    result = {}
+    for stats in stats_list:
+        cpge_types = category_to_types.get(stats.cpgeCategory, [])
+        for cpge_type in cpge_types:
+            result[cpge_type] = {
+                "admissionRatePct": round(stats.admissionRatePct, 1) if stats.admissionRatePct else None,
+                "candidats": stats.candidats,
+                "cpgeCategory": stats.cpgeCategory
+            }
+    
+    return result
+
