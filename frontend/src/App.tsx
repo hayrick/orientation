@@ -5,8 +5,10 @@ import { FormationCard } from './components/FormationCard';
 import { FormationDetailModal } from './components/FormationDetailModal';
 import { CPGEPage } from './components/CPGEPage';
 import { LicencesPage } from './components/LicencesPage';
+import { SettingsPage } from './components/SettingsPage';
+import { UserProfileProvider } from './context/UserProfileContext';
 import { Formation } from './types';
-import { Loader2, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
+import { Loader2, ChevronLeft, ChevronRight, BarChart3, GraduationCap, Settings } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -120,74 +122,64 @@ function HomePage() {
 
     return (
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex flex-col gap-8">
-                <div className='text-center space-y-2 mb-4'>
-                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-                        Trouvez votre voie <span className="text-blue-500">Parcoursup</span>
-                    </h1>
-                    <p className='text-gray-400 max-w-2xl mx-auto'>
-                        Analysez les données réelles pour maximiser vos chances d'admission.
-                    </p>
+
+
+            <SearchFilters
+                filters={filters}
+                categories={categories}
+                cpgeFilieres={cpgeFilieres}
+                onFilterChange={handleFilterChange}
+            />
+
+            {loading ? (
+                <div className="flex justify-center items-center py-20">
+                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
                 </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {formations.map(f => (
+                        <FormationCard key={f.id} formation={f} onClick={handleFormationClick} />
+                    ))}
+                    {formations.length === 0 && (
+                        <div className="col-span-full text-center py-20 text-gray-500">
+                            Aucune formation trouvée. Essayez d'ajuster vos filtres.
+                        </div>
+                    )}
+                </div>
+            )}
 
-                <SearchFilters
-                    filters={filters}
-                    categories={categories}
-                    cpgeFilieres={cpgeFilieres}
-                    onFilterChange={handleFilterChange}
-                />
-
-                {loading ? (
-                    <div className="flex justify-center items-center py-20">
-                        <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {formations.map(f => (
-                            <FormationCard key={f.id} formation={f} onClick={handleFormationClick} />
-                        ))}
-                        {formations.length === 0 && (
-                            <div className="col-span-full text-center py-20 text-gray-500">
-                                Aucune formation trouvée. Essayez d'ajuster vos filtres.
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {!loading && total > 0 && (
-                    <div className="flex justify-center items-center space-x-4 pt-8 border-t border-gray-800">
-                        <button
-                            onClick={() => handlePageChange(page - 1)}
-                            disabled={page === 1}
-                            className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <span className="text-gray-400">
-                            Page <span className="text-white font-mono">{page}</span> sur <span className="text-white font-mono">{Math.ceil(total / limit)}</span>
-                        </span>
-                        <button
-                            onClick={() => handlePageChange(page + 1)}
-                            disabled={page >= Math.ceil(total / limit)}
-                            className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
-                    </div>
-                )}
-            </div>
-
+            {!loading && total > 0 && (
+                <div className="flex justify-center items-center space-x-4 pt-8 border-t border-gray-800">
+                    <button
+                        onClick={() => handlePageChange(page - 1)}
+                        disabled={page === 1}
+                        className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <span className="text-gray-400">
+                        Page <span className="text-white font-mono">{page}</span> sur <span className="text-white font-mono">{Math.ceil(total / limit)}</span>
+                    </span>
+                    <button
+                        onClick={() => handlePageChange(page + 1)}
+                        disabled={page >= Math.ceil(total / limit)}
+                        className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
+                </div>
+            )}
             <FormationDetailModal
                 formation={selectedFormation}
                 onClose={() => setSelectedFormation(null)}
             />
-        </main>
+        </main >
     );
 }
 
 function AppContent() {
     const location = useLocation();
-    const isFullscreenPage = location.pathname === '/cpge-explorer' || location.pathname === '/licences';
+    const isFullscreenPage = location.pathname === '/cpge-explorer' || location.pathname === '/licences' || location.pathname === '/settings';
 
     return (
         <div className="min-h-screen bg-[#111827] text-white">
@@ -202,10 +194,19 @@ function AppContent() {
 
                         <nav className="flex items-center space-x-1 sm:space-x-4">
                             <Link
-                                to="/"
-                                className="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+                                to="/settings"
+                                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                                title="Mon Profil"
                             >
-                                Recherche
+                                <Settings className="w-5 h-5" />
+                            </Link>
+                            <Link
+                                to="/licences"
+                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-lg text-sm font-bold text-white shadow-lg shadow-cyan-500/20 transition-all transform hover:scale-105 active:scale-95"
+                            >
+                                <GraduationCap className="w-4 h-4" />
+                                <span className="hidden sm:inline">Licences Explorer</span>
+                                <span className="sm:hidden">Licences</span>
                             </Link>
                             <Link
                                 to="/cpge-explorer"
@@ -224,6 +225,7 @@ function AppContent() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/cpge-explorer" element={<CPGEPage />} />
                 <Route path="/licences" element={<LicencesPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
             </Routes>
         </div>
     );
@@ -232,7 +234,9 @@ function AppContent() {
 function App() {
     return (
         <BrowserRouter>
-            <AppContent />
+            <UserProfileProvider>
+                <AppContent />
+            </UserProfileProvider>
         </BrowserRouter>
     );
 }

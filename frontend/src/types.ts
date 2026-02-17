@@ -82,3 +82,13 @@ export interface SpecialtyAdmissionRate {
     cpgeCategory: string;
 }
 
+export interface UserProfile {
+    id: string;
+    name: string | null;
+    specialty1Id: string | null;
+    specialty2Id: string | null;
+    department: string | null;
+    grade: number | null;
+    favoriteIds: string[];
+}
+

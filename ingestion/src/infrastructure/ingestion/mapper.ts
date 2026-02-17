@@ -1,5 +1,4 @@
 
-import { Student } from '../../domain/entities/Student';
 import { School } from '../../domain/entities/School';
 import { SchoolLocation } from '../../domain/entities/SchoolLocation';
 import { Formation } from '../../domain/entities/Formation';

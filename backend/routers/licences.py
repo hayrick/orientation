@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from typing import List, Optional
@@ -56,7 +57,6 @@ def get_licence_formations(
         
         if licence_type in KEYWORD_OVERRIDES:
             # Use override keywords with OR logic (any keyword matches)
-            from sqlalchemy import or_
             conditions = [
                 models.Formation.filiereFormationDetaillee.ilike(f"%{kw}%")
                 for kw in KEYWORD_OVERRIDES[licence_type]

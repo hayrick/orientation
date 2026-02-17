@@ -1,8 +1,17 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import search, licences
+from .routers import search, licences, users
 
-app = FastAPI(title="Orientation API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Registered Routes:")
+    for route in app.routes:
+        print(f" - {route.path} [{route.name}]")
+    yield
+
+app = FastAPI(title="Orientation API", lifespan=lifespan)
 
 # Configure CORS for React frontend
 origins = [
@@ -22,25 +31,8 @@ app.include_router(search.router)
 app.include_router(search.school_router)
 app.include_router(search.specialty_router)
 app.include_router(licences.router)
+app.include_router(users.router)
 
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-
-@app.get("/routes")
-def get_routes():
-    routes_list = []
-    for route in app.routes:
-        methods = list(route.methods) if hasattr(route, "methods") else None
-        routes_list.append({
-            "path": route.path,
-            "name": route.name,
-            "methods": methods
-        })
-    return routes_list
-
-@app.on_event("startup")
-async def startup_event():
-    print("Registered Routes:")
-    for route in app.routes:
-        print(f" - {route.path} [{route.name}]")

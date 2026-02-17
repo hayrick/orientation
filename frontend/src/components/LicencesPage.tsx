@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Loader2, ExternalLink, GraduationCap } from 'lucide-react';
+import { Home, Loader2, ExternalLink, GraduationCap, Star, User } from 'lucide-react';
 import { motion, LayoutGroup } from 'framer-motion';
 import { Specialty, SpecialtyAdmissionRate } from '../types';
+import { useUserProfile } from '../context/UserProfileContext';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -146,16 +147,17 @@ interface Department {
 }
 
 export function LicencesPage() {
+    const { profile, toggleFavorite, isFavorite } = useUserProfile();
     const [licenceTypes, setLicenceTypes] = useState<string[]>([]);
     const [selectedType, setSelectedType] = useState<string>('');
     const [formations, setFormations] = useState<LicenceFormation[]>([]);
     const [specialties, setSpecialties] = useState<Specialty[]>([]);
-    const [specialty1, setSpecialty1] = useState<string>('maths');
-    const [specialty2, setSpecialty2] = useState<string>('physique-chimie');
+    const [specialty1, setSpecialty1] = useState<string>(profile?.specialty1Id || 'maths');
+    const [specialty2, setSpecialty2] = useState<string>(profile?.specialty2Id || 'physique-chimie');
     const [admissionRates, setAdmissionRates] = useState<Record<string, SpecialtyAdmissionRate>>({});
     const [departments, setDepartments] = useState<Department[]>([]);
-    const [selectedDept, setSelectedDept] = useState<string>('');
-    const [studentGrade, setStudentGrade] = useState(15.0);
+    const [selectedDept, setSelectedDept] = useState<string>(profile?.department || '');
+    const [studentGrade, setStudentGrade] = useState(profile?.grade ?? 15.0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [hoveredFormation, setHoveredFormation] = useState<string | null>(null);
@@ -608,6 +610,16 @@ export function LicencesPage() {
                                                     </div>
                                                 )}
                                             </div>
+
+                                            {/* Favorite Star */}
+                                            {profile && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); toggleFavorite(formation.id); }}
+                                                    className="absolute bottom-1.5 right-1.5 p-0.5 rounded-full hover:bg-white/10 transition-all z-20"
+                                                >
+                                                    <Star className={`w-3 h-3 transition-all ${isFavorite(formation.id) ? 'fill-yellow-400 text-yellow-400' : 'text-white/20 hover:text-yellow-400'}`} />
+                                                </button>
+                                            )}
                                         </motion.div>
                                     );
                                 })}
@@ -639,6 +651,13 @@ export function LicencesPage() {
                 >
                     <GraduationCap className="w-4 h-4" />
                     <span className="text-sm font-medium">CPGE Explorer</span>
+                </Link>
+                <Link
+                    to="/settings"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                >
+                    <User className="w-4 h-4" />
+                    <span className="text-sm font-medium">Profil</span>
                 </Link>
             </nav >
         </div >

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, School as SchoolIcon, Trophy, Info, Home, Loader2, ExternalLink } from 'lucide-react';
+import { GraduationCap, School as SchoolIcon, Trophy, Info, Home, Loader2, ExternalLink, Star, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PanierDetail, PanierSchoolStats, Specialty, SpecialtyAdmissionRate } from '../types';
+import { useUserProfile } from '../context/UserProfileContext';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -16,10 +17,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const schoolIcons = [GraduationCap, SchoolIcon, Trophy];
 
 export function CPGEPage() {
+    const { profile, toggleFavorite, isFavorite } = useUserProfile();
     const [types, setTypes] = useState<string[]>([]);
     const [selectedType, setSelectedType] = useState<string>('');
     const [selectedDept, setSelectedDept] = useState<string>('');
-    const [studentGrade, setStudentGrade] = useState<number>(16.5);
+    const [studentGrade, setStudentGrade] = useState<number>(profile?.grade ?? 16.5);
     const [paniers, setPaniers] = useState<PanierDetail[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -64,10 +66,12 @@ export function CPGEPage() {
                     setSpecialties(data);
                     // Set default selections (most common: Maths + Physics-Chem)
                     if (data.length >= 2) {
-                        const maths = data.find((s: Specialty) => s.id === 'maths');
-                        const physChem = data.find((s: Specialty) => s.id === 'physique-chimie');
-                        if (maths) setSpecialty1(maths.id);
-                        if (physChem) setSpecialty2(physChem.id);
+                        const s1Id = profile?.specialty1Id || 'maths';
+                        const s2Id = profile?.specialty2Id || 'physique-chimie';
+                        const s1 = data.find((s: Specialty) => s.id === s1Id);
+                        const s2 = data.find((s: Specialty) => s.id === s2Id);
+                        if (s1) setSpecialty1(s1.id);
+                        if (s2) setSpecialty2(s2.id);
                     }
                 }
             })
@@ -590,6 +594,16 @@ export function CPGEPage() {
                                             </span>
                                         </div>
                                     </div>
+
+                                    {/* Favorite Star */}
+                                    {profile && (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); toggleFavorite(school.id); }}
+                                            className="absolute bottom-1.5 right-1.5 p-0.5 rounded-full hover:bg-white/10 transition-all z-20"
+                                        >
+                                            <Star className={`w-3 h-3 transition-all ${isFavorite(school.id) ? 'fill-yellow-400 text-yellow-400' : 'text-white/20 hover:text-yellow-400'}`} />
+                                        </button>
+                                    )}
                                 </motion.div>
                             );
                         })}
@@ -745,6 +759,13 @@ export function CPGEPage() {
                 >
                     <GraduationCap className="w-4 h-4" />
                     <span className="text-sm font-medium">Licences</span>
+                </Link>
+                <Link
+                    to="/settings"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                >
+                    <User className="w-4 h-4" />
+                    <span className="text-sm font-medium">Profil</span>
                 </Link>
             </nav>
         </div>

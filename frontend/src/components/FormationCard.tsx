@@ -1,5 +1,6 @@
 import { Formation } from '../types';
-import { MapPin, Users, TrendingUp } from 'lucide-react';
+import { MapPin, Users, TrendingUp, Star } from 'lucide-react';
+import { useUserProfile } from '../context/UserProfileContext';
 
 interface FormationCardProps {
     formation: Formation;
@@ -7,13 +8,37 @@ interface FormationCardProps {
 }
 
 export function FormationCard({ formation, onClick }: FormationCardProps) {
+    const { profile, toggleFavorite, isFavorite } = useUserProfile();
+    const favorited = isFavorite(formation.id);
+
+    const handleStar = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        toggleFavorite(formation.id);
+    };
+
     return (
         <div
             onClick={() => onClick(formation.id)}
-            className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all cursor-pointer shadow-lg hover:shadow-blue-500/10 group"
+            className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all cursor-pointer shadow-lg hover:shadow-blue-500/10 group relative"
         >
+            {/* Star button */}
+            {profile && (
+                <button
+                    onClick={handleStar}
+                    className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-white/10 transition-all z-10"
+                    title={favorited ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                >
+                    <Star
+                        className={`w-4 h-4 transition-all ${favorited
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'text-gray-500 hover:text-yellow-400'
+                            }`}
+                    />
+                </button>
+            )}
+
             <div className="flex justify-between items-start mb-4">
-                <div>
+                <div className="pr-8">
                     <h3 className="text-lg font-bold text-white group-hover:text-blue-400 leading-tight">
                         {formation.name}
                     </h3>

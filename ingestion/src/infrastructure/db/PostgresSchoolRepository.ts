@@ -13,96 +13,90 @@ export class PostgresSchoolRepository implements SchoolRepository {
     }
 
     async saveAll(schools: School[], locations: SchoolLocation[], formations: Formation[]): Promise<void> {
-        // Ideally use a transaction
-        // This is a naive implementation for batch ingestion
+        await this.prisma.$transaction(async (tx) => {
+            // Upsert Schools
+            for (const school of schools) {
+                await tx.school.upsert({
+                    where: { uai: school.uai },
+                    update: { name: school.name, status: school.status },
+                    create: { uai: school.uai, name: school.name, status: school.status }
+                });
+            }
 
-        // Upsert Schools
-        for (const school of schools) {
-            await this.prisma.school.upsert({
-                where: { uai: school.uai },
-                update: { name: school.name, status: school.status },
-                create: { uai: school.uai, name: school.name, status: school.status }
-            });
-        }
+            // Upsert Locations
+            for (const loc of locations) {
+                await tx.schoolLocation.upsert({
+                    where: { id: loc.id },
+                    update: {
+                        schoolUai: loc.schoolUai,
+                        city: loc.city,
+                        departmentCode: loc.departmentCode,
+                        departmentName: loc.departmentName,
+                        region: loc.region,
+                        academy: loc.academy,
+                        latitude: loc.gpsCoordinates?.lat,
+                        longitude: loc.gpsCoordinates?.long,
+                    },
+                    create: {
+                        id: loc.id,
+                        schoolUai: loc.schoolUai,
+                        city: loc.city,
+                        departmentCode: loc.departmentCode,
+                        departmentName: loc.departmentName,
+                        region: loc.region,
+                        academy: loc.academy,
+                        latitude: loc.gpsCoordinates?.lat,
+                        longitude: loc.gpsCoordinates?.long,
+                    }
+                });
+            }
 
-        for (const loc of locations) {
-            await this.prisma.schoolLocation.upsert({
-                where: { id: loc.id },
-                update: {
-                    schoolUai: loc.schoolUai,
-                    city: loc.city,
-                    departmentCode: loc.departmentCode,
-                    departmentName: loc.departmentName,
-                    region: loc.region,
-                    academy: loc.academy,
-                    latitude: loc.gpsCoordinates?.lat,
-                    longitude: loc.gpsCoordinates?.long,
-                },
-                create: {
-                    id: loc.id,
-                    schoolUai: loc.schoolUai,
-                    city: loc.city,
-                    departmentCode: loc.departmentCode,
-                    departmentName: loc.departmentName,
-                    region: loc.region,
-                    academy: loc.academy,
-                    latitude: loc.gpsCoordinates?.lat,
-                    longitude: loc.gpsCoordinates?.long,
-                }
-            });
-        }
+            // Upsert Formations
+            for (const form of formations) {
+                const mentionDist = JSON.stringify(form.stats.mentionDistribution || {});
 
-        // Upsert Locations (derived from formations locationId usually, but here passed how? 
-        // The ingestion script needs to pass locations too. 
-        // Let's assume the Entity model handles this separation.)
-
-        // Upsert Formations
-        for (const form of formations) {
-            // Ensure location exists first (or handle via nested writes if we restructured)
-            // For now, assuming locations are pre-saved or we duplicate logic here using form.locationId props
-            // This part needs the Location objects to be passed or extracted.
-
-            const mentionDist = JSON.stringify(form.stats.mentionDistribution || {}); // Cast for Prisma JSON
-
-            await this.prisma.formation.upsert({
-                where: { id: form.id },
-                update: {
-                    schoolUai: form.schoolUai,
-                    name: form.name,
-                    filiereFormationDetaillee: form.filiereFormationDetaillee,
-                    filiereFormationDetailleeBis: form.filiereFormationDetailleeBis,
-                    filiereTresDetaillee: form.filiereTresDetaillee,
-                    parcoursupLink: form.parcoursupLink,
-                    selectivity: form.selectivity,
-                    capacity: form.capacity,
-                    totalCandidates: form.totalCandidates,
-                    totalCandidatesWithAdmissionProposal: form.totalCandidatesWithAdmissionProposal,
-                    admissionRate: form.stats.admissionRate,
-                    lastCalledRank: form.stats.lastCalledRank,
-                    genderParity: form.stats.genderParity,
-                    mentionDistribution: mentionDist || {},
-                },
-                create: {
-                    id: form.id,
-                    schoolUai: form.schoolUai,
-                    locationId: form.locationId,
-                    name: form.name,
-                    filiereFormationDetaillee: form.filiereFormationDetaillee,
-                    filiereFormationDetailleeBis: form.filiereFormationDetailleeBis,
-                    filiereTresDetaillee: form.filiereTresDetaillee,
-                    parcoursupLink: form.parcoursupLink,
-                    category: form.category,
-                    selectivity: form.selectivity,
-                    capacity: form.capacity,
-                    totalCandidates: form.totalCandidates,
-                    totalCandidatesWithAdmissionProposal: form.totalCandidatesWithAdmissionProposal,
-                    admissionRate: form.stats.admissionRate,
-                    lastCalledRank: form.stats.lastCalledRank,
-                    genderParity: form.stats.genderParity,
-                    mentionDistribution: mentionDist || {},
-                }
-            });
-        }
+                await tx.formation.upsert({
+                    where: { id: form.id },
+                    update: {
+                        schoolUai: form.schoolUai,
+                        locationId: form.locationId,
+                        name: form.name,
+                        filiereFormationDetaillee: form.filiereFormationDetaillee,
+                        filiereFormationDetailleeBis: form.filiereFormationDetailleeBis,
+                        filiereTresDetaillee: form.filiereTresDetaillee,
+                        parcoursupLink: form.parcoursupLink,
+                        category: form.category,
+                        selectivity: form.selectivity,
+                        capacity: form.capacity,
+                        totalCandidates: form.totalCandidates,
+                        totalCandidatesWithAdmissionProposal: form.totalCandidatesWithAdmissionProposal,
+                        admissionRate: form.stats.admissionRate,
+                        lastCalledRank: form.stats.lastCalledRank,
+                        genderParity: form.stats.genderParity,
+                        mentionDistribution: mentionDist,
+                    },
+                    create: {
+                        id: form.id,
+                        schoolUai: form.schoolUai,
+                        locationId: form.locationId,
+                        name: form.name,
+                        filiereFormationDetaillee: form.filiereFormationDetaillee,
+                        filiereFormationDetailleeBis: form.filiereFormationDetailleeBis,
+                        filiereTresDetaillee: form.filiereTresDetaillee,
+                        parcoursupLink: form.parcoursupLink,
+                        category: form.category,
+                        selectivity: form.selectivity,
+                        capacity: form.capacity,
+                        totalCandidates: form.totalCandidates,
+                        totalCandidatesWithAdmissionProposal: form.totalCandidatesWithAdmissionProposal,
+                        admissionRate: form.stats.admissionRate,
+                        lastCalledRank: form.stats.lastCalledRank,
+                        genderParity: form.stats.genderParity,
+                        mentionDistribution: mentionDist,
+                    }
+                });
+            }
+        }, { timeout: 120000 });
     }
 
     async findByUai(uai: string): Promise<School | null> {
@@ -111,7 +105,7 @@ export class PostgresSchoolRepository implements SchoolRepository {
         return {
             uai: raw.uai,
             name: raw.name,
-            status: raw.status as 'Public' | 'Privé' // Cast needs validation
+            status: raw.status as 'Public' | 'Privé' | 'Autre'
         };
     }
 
@@ -148,5 +142,9 @@ export class PostgresSchoolRepository implements SchoolRepository {
                 mentionDistribution: f.mentionDistribution ? JSON.parse(f.mentionDistribution) : {}
             }
         }));
+    }
+
+    async disconnect(): Promise<void> {
+        await this.prisma.$disconnect();
     }
 }

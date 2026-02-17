@@ -142,3 +142,28 @@ class SpecialtyAdmissionStats(Base):
     specialty1 = relationship("Specialty", foreign_keys=[specialty1Id])
     specialty2 = relationship("Specialty", foreign_keys=[specialty2Id])
 
+
+# ============================================
+# User Profile
+# ============================================
+
+class UserProfile(Base):
+    __tablename__ = "UserProfile"
+
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=True)
+    specialty1Id = Column(String, ForeignKey("Specialty.id"), nullable=True)
+    specialty2Id = Column(String, ForeignKey("Specialty.id"), nullable=True)
+    department = Column(String, nullable=True)
+    grade = Column(Float, nullable=True)
+
+    favorites = relationship("UserFavorite", back_populates="user", cascade="all, delete-orphan")
+
+
+class UserFavorite(Base):
+    __tablename__ = "UserFavorite"
+
+    userId = Column(String, ForeignKey("UserProfile.id"), primary_key=True)
+    formationId = Column(String, primary_key=True)  # Can be Formation.id or PanierSchoolStats.id
+
+    user = relationship("UserProfile", back_populates="favorites")

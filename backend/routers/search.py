@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from .. import models, schemas
@@ -85,8 +86,6 @@ def get_paniers_by_type(cpge_type: str = Query(..., description="The CPGE type f
     # Track schools that should be excluded due to override mappings
     schools_to_exclude = set()
     if uai_list:
-        from sqlalchemy import or_
-        
         # We need to consider both global mappings and school-specific overrides
         global_filieres = get_parcoursup_types(cpge_type, db)
         
@@ -221,7 +220,7 @@ def search_formations(
     limit: int = 20,
     db: Session = Depends(get_db)
 ):
-    print(f"DEBUG: Search request params - city='{city}', department='{department}', category='{category}', school='{school_name}', rate={min_admission_rate}, filiere_bis={filiere_bis}")
+
     
     query = db.query(models.Formation).options(
         joinedload(models.Formation.school).joinedload(models.School.panier_stats).joinedload(models.PanierSchoolStats.panier),
@@ -244,7 +243,6 @@ def search_formations(
         query = query.filter(models.Formation.admissionRate >= min_admission_rate)
     
     if filiere_bis:
-        from sqlalchemy import or_
         expanded_types = []
         for f in filiere_bis:
             expanded_types.extend(get_parcoursup_types(f, db))
@@ -262,7 +260,7 @@ def search_formations(
     offset = (page - 1) * limit
     results = query.offset(offset).limit(limit).all()
     
-    print(f"DEBUG: Found {len(results)} results (Total: {total})")
+
     
     return {
         "items": results,

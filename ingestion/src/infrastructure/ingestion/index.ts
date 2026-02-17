@@ -12,6 +12,7 @@ async function main() {
     const filePath = path.join(process.cwd(), 'data/parcoursup/2025/fr-esr-parcoursup.csv');
     console.log(`Reading from ${filePath}...`);
 
+    const repo = new PostgresSchoolRepository();
     try {
         const allRecords = await parseParcoursupData(filePath);
 
@@ -35,12 +36,13 @@ async function main() {
 
         console.log(`Ingesting ${uniqueSchools.length} schools, ${uniqueLocations.length} locations, and ${formations.length} formations...`);
 
-        const repo = new PostgresSchoolRepository();
         await repo.saveAll(uniqueSchools, uniqueLocations, formations);
 
         console.log("Ingestion completed.");
     } catch (error) {
         console.error("Error during ingestion:", error);
+    } finally {
+        await repo.disconnect();
     }
 }
 
