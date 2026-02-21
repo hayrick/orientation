@@ -106,6 +106,63 @@ model CpgeMapping {
 }
 
 // ============================================
+// MonMaster Data Models
+// ============================================
+
+// A single master formation offering at a specific university
+model MonMasterFormation {
+  id                    String  @id     // CSV "Identifiant de la formation"
+  etablissementId       String          // UAI code
+  etablissementNom      String
+  mention               String          // e.g. "BIO-INFORMATIQUE"
+  parcours              String?         // e.g. "In Silico Drug Design"
+  secteurDisciplinaire  String          // e.g. "Sciences de la vie, biologie, santé"
+  secteurId             String          // e.g. "06"
+  discipline            String          // Mid-level discipline name
+  alternance            Boolean
+  modalite              String?         // INITIALE, CONTINUE, APPRENTISSAGE
+  ville                 String?
+  academie              String?
+  region                String?
+  capacite              Int?
+  candidats             Int?            // Total candidates (phase principale)
+  classes               Int?            // Ranked candidates
+  propositions          Int?            // Candidates with proposal
+  acceptes              Int?            // Candidates who accepted
+  admissionRate         Float?          // propositions / candidats * 100
+  rangDernierAppelePP   Int?            // Last called rank (main phase)
+  pctFemmes             Float?          // % women among accepted
+  pctMemeEtablissement  Float?          // % from same establishment
+  pctMemeAcademie       Float?          // % from same academy
+
+  secteurFormations     MasterSecteurFormation[]
+}
+
+// Grouping concept: a "secteur" + tier (Top 3, Top 5, Top 10)
+model MasterSecteur {
+  id                    String  @id     // e.g. "06-top3"
+  secteurDisciplinaire  String          // Full label
+  secteurId             String          // Numeric code
+  tier                  String          // "top3", "top5", "top10"
+
+  formations            MasterSecteurFormation[]
+
+  @@unique([secteurId, tier])
+}
+
+// Association: links a MasterSecteur tier to its ranked formations
+model MasterSecteurFormation {
+  masterSecteurId       String
+  monMasterFormationId  String
+  rank                  Int             // Rank within this secteur (1 = most selective)
+
+  masterSecteur         MasterSecteur         @relation(fields: [masterSecteurId], references: [id])
+  monMasterFormation    MonMasterFormation     @relation(fields: [monMasterFormationId], references: [id])
+
+  @@id([masterSecteurId, monMasterFormationId])
+}
+
+// ============================================
 // Specialty Admission Data Tables
 // ============================================
 

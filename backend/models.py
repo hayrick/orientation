@@ -110,6 +110,62 @@ class CpgeMapping(Base):
     schoolUai = Column(String, nullable=True)
 
 # ============================================
+# MonMaster Data Models
+# ============================================
+
+class MonMasterFormation(Base):
+    __tablename__ = "MonMasterFormation"
+
+    id = Column(String, primary_key=True)
+    etablissementId = Column(String)
+    etablissementNom = Column(String)
+    mention = Column(String)
+    parcours = Column(String, nullable=True)
+    secteurDisciplinaire = Column(String)
+    secteurId = Column(String)
+    discipline = Column(String)
+    alternance = Column(Boolean)
+    modalite = Column(String, nullable=True)
+    ville = Column(String, nullable=True)
+    academie = Column(String, nullable=True)
+    region = Column(String, nullable=True)
+    capacite = Column(Integer, nullable=True)
+    candidats = Column(Integer, nullable=True)
+    classes = Column(Integer, nullable=True)
+    propositions = Column(Integer, nullable=True)
+    acceptes = Column(Integer, nullable=True)
+    admissionRate = Column(Float, nullable=True)
+    rangDernierAppelePP = Column(Integer, nullable=True)
+    pctFemmes = Column(Float, nullable=True)
+    pctMemeEtablissement = Column(Float, nullable=True)
+    pctMemeAcademie = Column(Float, nullable=True)
+
+    secteur_formations = relationship("MasterSecteurFormation", back_populates="mon_master_formation")
+
+
+class MasterSecteur(Base):
+    __tablename__ = "MasterSecteur"
+
+    id = Column(String, primary_key=True)
+    secteurDisciplinaire = Column(String)
+    secteurId = Column(String)
+    tier = Column(String)  # "top3", "top5", "top10"
+
+    formations = relationship("MasterSecteurFormation", back_populates="master_secteur")
+
+
+class MasterSecteurFormation(Base):
+    __tablename__ = "MasterSecteurFormation"
+
+    masterSecteurId = Column(String, ForeignKey("MasterSecteur.id"), primary_key=True)
+    monMasterFormationId = Column(String, ForeignKey("MonMasterFormation.id"), primary_key=True)
+    rank = Column(Integer)
+
+    master_secteur = relationship("MasterSecteur", back_populates="formations")
+    mon_master_formation = relationship("MonMasterFormation", back_populates="secteur_formations")
+
+
+# ============================================
 # Specialty Admission Data Models
 # ============================================
 
