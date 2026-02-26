@@ -41,10 +41,11 @@ dist/
 *.swo
 
 # Database
-ingestion/prisma/dev.db
+# (Commented out to allow versioning of the core database)
+# ingestion/prisma/dev.db
 ingestion/prisma/dev.db-journal
-*.sqlite
-*.db
+# *.sqlite
+# *.db
 
 # OS
 .DS_Store
@@ -65,5 +66,5 @@ reproduction.py
 backend/.venv/
 frontend/dist/
 scrapper-etudiant/venv/
-scrapper-etudiant/output_csv/*.csv
-!scrapper-etudiant/output_csv/mapping.csv
+# scrapper-etudiant/output_csv/*.csv
+
