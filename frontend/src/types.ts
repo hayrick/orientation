@@ -92,3 +92,20 @@ export interface UserProfile {
     favoriteIds: string[];
 }
 
+export interface RankedMonMasterFormation {
+    rank: number;
+    id: string;
+    mention: string;
+    parcours: string | null;
+    etablissement: string;
+    etablissementId: string;
+    ville: string | null;
+    academie: string | null;
+    region: string | null;
+    admissionRate: number;
+    capacite: number;
+    candidats: number;
+    acceptes: number;
+    alternance: boolean;
+    secteurDisciplinaire: string;
+}

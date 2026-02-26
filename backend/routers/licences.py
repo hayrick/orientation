@@ -150,3 +150,91 @@ def get_licence_departments(db: Session = Depends(get_db)):
     
     return [{"code": r[0], "name": r[1]} for r in sorted(results, key=lambda x: x[0] or "")]
 
+
+@router.get("/{licence_type}/top-masters")
+def get_top_masters_for_licence(
+    licence_type: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Given a Licence type (e.g., 'Licence Mathématiques'), find the matching
+    Master Secteur(s) and return the Top highly-selective Master formations.
+    """
+    # 1. Broad keyword mapping from Licence to Master Secteur
+    # Explicit overrides for tricky names
+    MAPPING_OVERRIDES = {
+        "Licence Sciences économiques": ["économie", "économétrie"],
+        "Licence Droit": ["juridiques", "droit européen"],
+        "Licence Histoire de l'art et archéologie": ["histoire de l'art", "archéologie"],
+        "Licence Langues, littératures et civilisations étrangères et régionales": ["langues, littératures et civilisations"],
+        "Licence STAPS": ["activités physiques et sportives"],
+        "Licence Sciences de la vie, de la santé, de la terre et de l univers": ["sciences de la vie", "sciences de la terre"],
+        "Licence Administration économique et sociale": ["administration économique et sociale", "management", "gestion"],
+        "Licence Mathématiques et informatique appliquées aux sciences humaines et sociales": ["mathématiques", "informatique", "sciences humaines"],
+        "Licence Physique, chimie": ["physique", "chimie"],
+        "Licence Sciences pour l'ingénieur": ["ingénieur", "mécanique", "électronique"],
+        "Licence Sciences sanitaires et sociales": ["santé", "sciences sociales"],
+        "Licence Sciences sociales": ["sociologie", "sciences sociales"],
+        "Licence Sciences de la vie": ["sciences de la vie", "biologie"],
+        "Licence Sciences de la Terre": ["sciences de la terre", "géosciences"],
+    }
+
+    keywords = []
+    if licence_type in MAPPING_OVERRIDES:
+        keywords = MAPPING_OVERRIDES[licence_type]
+    else:
+        # Extract keywords dynamically
+        subject = licence_type.replace("Licence ", "", 1).replace("Double ", "", 1).strip()
+        stop_words = {"et", "de", "la", "le", "les", "du", "des", "l", "d", "en", "aux", "pour", "ou"}
+        keywords = [w for w in subject.split() if w.lower() not in stop_words and len(w) > 3]
+
+    if not keywords:
+        return []
+
+    # 2. Find matching formations by checking if any of the keywords are in the secteurDisciplinaire
+    conditions = [
+        models.MonMasterFormation.secteurDisciplinaire.ilike(f"%{kw}%")
+        for kw in keywords
+    ]
+    
+    # 3. Query the absolute top 15 formations across matching disciplines
+    # Applying the same criteria used for rankings: capacite >= 20, candidats > 50
+    formations = db.query(models.MonMasterFormation)\
+        .filter(or_(*conditions))\
+        .filter(models.MonMasterFormation.capacite >= 20)\
+        .filter(models.MonMasterFormation.candidats > 50)\
+        .filter(models.MonMasterFormation.admissionRate != None)\
+        .order_by(models.MonMasterFormation.admissionRate.asc())\
+        .limit(15)\
+        .all()
+
+    result = {"top3": [], "top9": [], "top15": []}
+    
+    for i, formation in enumerate(formations):
+        data = {
+            "rank": i + 1,  # Sequential rank
+            "id": formation.id,
+            "mention": formation.mention,
+            "parcours": formation.parcours,
+            "etablissement": formation.etablissementNom,
+            "etablissementId": formation.etablissementId,
+            "ville": formation.ville,
+            "academie": formation.academie,
+            "region": formation.region,
+            "admissionRate": formation.admissionRate,
+            "capacite": formation.capacite,
+            "candidats": formation.candidats,
+            "acceptes": formation.acceptes,
+            "alternance": formation.alternance,
+            "secteurDisciplinaire": formation.secteurDisciplinaire,
+        }
+        
+        # Bucket by rank (1-3, 4-9, 10-15)
+        if i < 3:
+            result["top3"].append(data)
+        elif i < 9:
+            result["top9"].append(data)
+        else:
+            result["top15"].append(data)
+
+    return result

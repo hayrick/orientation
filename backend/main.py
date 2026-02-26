@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import search, licences, users
+from .routers import search, licences, users, masters
 
 
 @asynccontextmanager
@@ -32,6 +32,7 @@ app.include_router(search.school_router)
 app.include_router(search.specialty_router)
 app.include_router(licences.router)
 app.include_router(users.router)
+app.include_router(masters.router)
 
 @app.get("/health")
 def health_check():

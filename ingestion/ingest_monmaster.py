@@ -209,10 +209,11 @@ def ingest():
             pct_acad_col = "Part des candidats parmi ceux ayant accepté une proposition d'admission pour une candidature formulée en phase principale ou en phase complémentaire issus de la même académie (à partir du lieu de formation)"
             pct_acad = parse_float(row[col_idx[pct_acad_col]]) if pct_acad_col in col_idx else None
 
-            # Compute admission rate
+            # Compute admission rate: rang dernier appelé / capacité
+            # Lower ratio = more selective (only top-ranked candidates get in)
             admission_rate = None
-            if candidats and candidats > 0 and propositions is not None:
-                admission_rate = round(propositions / candidats * 100, 2)
+            if rang_dernier and rang_dernier > 0 and capacite and capacite > 0:
+                admission_rate = round(rang_dernier / capacite, 2)
 
             formations_to_insert.append((
                 formation_id, etablissement_id, etablissement_nom,
@@ -237,11 +238,16 @@ def ingest():
     # Step 3: Group by secteur and rank by selectivity
     print("\n3. Building secteur rankings...")
 
-    # Fetch all formations with valid admission rates
+    # Fetch formations eligible for ranking:
+    # - Must have a valid admission rate (rangDernierAppelePP / capacite)
+    # - At least 20 seats offered
+    # - More than 50 candidates
     cursor.execute("""
         SELECT id, secteurId, secteurDisciplinaire, admissionRate, candidats
         FROM MonMasterFormation
-        WHERE admissionRate IS NOT NULL AND candidats IS NOT NULL AND candidats >= 10
+        WHERE admissionRate IS NOT NULL AND admissionRate > 0
+          AND capacite IS NOT NULL AND capacite >= 20
+          AND candidats IS NOT NULL AND candidats > 50
         ORDER BY secteurId, admissionRate ASC
     """)
 

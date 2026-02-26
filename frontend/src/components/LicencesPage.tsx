@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Loader2, ExternalLink, GraduationCap, Star, User } from 'lucide-react';
+import { Home, Loader2, ExternalLink, GraduationCap, Star, User, Trophy } from 'lucide-react';
 import { motion, LayoutGroup } from 'framer-motion';
-import { Specialty, SpecialtyAdmissionRate } from '../types';
+import { Specialty, SpecialtyAdmissionRate, RankedMonMasterFormation } from '../types';
 import { useUserProfile } from '../context/UserProfileContext';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -151,6 +151,7 @@ export function LicencesPage() {
     const [licenceTypes, setLicenceTypes] = useState<string[]>([]);
     const [selectedType, setSelectedType] = useState<string>('');
     const [formations, setFormations] = useState<LicenceFormation[]>([]);
+    const [topMasters, setTopMasters] = useState<Record<'top3' | 'top9' | 'top15', RankedMonMasterFormation[]> | null>(null);
     const [specialties, setSpecialties] = useState<Specialty[]>([]);
     const [specialty1, setSpecialty1] = useState<string>(profile?.specialty1Id || 'maths');
     const [specialty2, setSpecialty2] = useState<string>(profile?.specialty2Id || 'physique-chimie');
@@ -243,6 +244,11 @@ export function LicencesPage() {
                 .then(res => res.json())
                 .then(data => setFormations(data))
                 .catch(err => console.error("Failed to fetch formations", err));
+
+            fetch(`${API_URL}/licences/${encodeURIComponent(selectedType)}/top-masters`)
+                .then(res => res.json())
+                .then(data => setTopMasters(data))
+                .catch(err => console.error("Failed to fetch top masters", err));
         }
     }, [selectedType, selectedDept]);
 
@@ -420,7 +426,7 @@ export function LicencesPage() {
             )}
 
             {/* Main Content */}
-            <main className="pt-16 pb-20 h-screen grid grid-cols-[120px_1fr] relative overflow-hidden">
+            <main className="pt-16 pb-20 h-screen grid grid-cols-[120px_1fr] lg:grid-cols-[120px_1fr_350px] relative overflow-hidden">
                 {/* ZONE 1: GRADE SLIDER (same as CPGE) */}
                 <div className="h-[calc(100%-120px)] flex flex-col items-center justify-center px-6">
                     <div className="text-center mb-6">
@@ -633,6 +639,98 @@ export function LicencesPage() {
                             <p className="text-sm">Essayez un autre type de Licence ou département</p>
                         </div>
                     )}
+                </div>
+
+                {/* ZONE 3: Top Masters (Objectif) */}
+                <div className="hidden lg:flex flex-col border-l border-white/10 bg-black/20 backdrop-blur-md h-full overflow-y-auto p-6 z-20">
+                    <div className="flex items-center gap-3 mb-6 shrink-0">
+                        <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                            <GraduationCap className="w-5 h-5 text-indigo-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-sm font-bold text-white tracking-wide uppercase">Objectif Master</h2>
+                            <p className="text-[10px] text-white/50 leading-tight">Masters prestigieux après cette Licence</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-4 w-[280px]">
+                        {/* Iterate over the available tiers */}
+                        {topMasters && Object.entries(topMasters).map(([tierKey, mastersList]) => {
+                            if (!mastersList || mastersList.length === 0) return null;
+
+                            // Styling parameters per tier
+                            const tierStyles = {
+                                top3: {
+                                    bg: "bg-gradient-to-br from-indigo-500/20 to-purple-500/10",
+                                    border: "border-indigo-400/40",
+                                    glow: "shadow-[0_0_20px_rgba(99,102,241,0.2)]",
+                                    title: "Rangs 1 à 3",
+                                    icon: "text-indigo-300"
+                                },
+                                top9: {
+                                    bg: "bg-gradient-to-br from-blue-500/20 to-cyan-500/10",
+                                    border: "border-blue-400/40",
+                                    glow: "shadow-[0_0_15px_rgba(59,130,246,0.15)]",
+                                    title: "Rangs 4 à 9",
+                                    icon: "text-blue-300"
+                                },
+                                top15: {
+                                    bg: "bg-gradient-to-br from-emerald-500/10 to-teal-500/5",
+                                    border: "border-emerald-400/30",
+                                    glow: "",
+                                    title: "Rangs 10 à 15",
+                                    icon: "text-emerald-300"
+                                }
+                            };
+                            const style = tierStyles[tierKey as keyof typeof tierStyles];
+                            if (!style) return null;
+
+                            return (
+                                <div key={tierKey} className={cn("rounded-2xl border p-3 backdrop-blur-md relative overflow-hidden", style.bg, style.border, style.glow)}>
+                                    <div className="flex items-center gap-2 mb-3 border-b border-white/10 pb-2">
+                                        <Trophy className={cn("w-3.5 h-3.5", style.icon)} />
+                                        <h3 className="text-[10px] font-bold text-white uppercase tracking-wider">{style.title}</h3>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        {mastersList.map((master) => (
+                                            <a
+                                                key={master.id}
+                                                href={`https://monmaster.gouv.fr/formation/${master.etablissementId}/${master.id}/detail`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block relative bg-black/20 rounded-lg p-2 border border-white/5 hover:bg-white/5 hover:border-white/10 transition-all group/card"
+                                            >
+                                                <div className="flex items-start gap-1.5 mb-0.5 relative">
+                                                    <span className={cn("text-[9px] font-black shrink-0 mt-[1px]", style.icon)}>{master.rank}.</span>
+                                                    <div className="text-[10px] font-bold text-white leading-tight line-clamp-2 pr-4">{master.mention}</div>
+                                                    <ExternalLink className="w-2.5 h-2.5 absolute top-0 right-0 opacity-0 group-hover/card:opacity-100 transition-opacity text-white/50" />
+                                                </div>
+                                                {master.parcours && <div className="text-[8px] text-white/50 mb-1 leading-tight line-clamp-1 ml-3 pr-2">— {master.parcours}</div>}
+                                                <div className="flex justify-between items-center text-[9px] mt-1.5 pt-1.5 border-t border-white/5 ml-3">
+                                                    <span className="text-white/80 truncate pr-1" title={master.etablissement}>{abbreviateSchoolName(master.etablissement)}</span>
+                                                    <div className="flex items-center gap-1 shrink-0">
+                                                        <span className={cn("font-bold text-[9px]", style.icon)}>{master.admissionRate.toFixed(1)}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {(!topMasters || Object.values(topMasters).every(list => list.length === 0)) && !loading && (
+                            <div className="text-center py-8 px-4 text-white/30 text-xs border border-dashed border-white/10 rounded-xl">
+                                Aucun objectif Master trouvé pour cette Licence.
+                            </div>
+                        )}
+                        {loading && (!topMasters || Object.values(topMasters).every(list => list.length === 0)) && (
+                            <div className="flex justify-center items-center py-8">
+                                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </main >
 
